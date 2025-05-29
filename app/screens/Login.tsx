@@ -1,18 +1,41 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, createContext, useContext, useReducer } from 'react'
 import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, Image, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import * as Font from 'expo-font';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import AnimatedButton from '@/assets/components/AnimatedButton';
+import { collection, addDoc, doc, setDoc } from "firebase/firestore";
+import { db } from '../../FirebaseConfig';
+import {IdProvider, IdContext} from '../../Global/IdContext';
+
+
 
 const Login = () => {
+
+    const addUserWithCustomId = async (userId: string, name: string, email: string) => {
+        try {
+          const userDocRef = doc(db, "users", userId);
+      
+          await setDoc(userDocRef, {
+            name: name,
+            email: email,
+            balance: 0
+          });
+      
+          console.log("Document successfully written with ID: ", userId);
+      
+        } catch (e) {
+          console.error("Error writing document: ", e);
+        }
+      }
+
     const [fontLoaded, setFontLoaded] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const auth = FIREBASE_AUTH;
-    
+    const{ globUser, setGlobUser } = useContext(IdContext);
 
     useEffect(() => {
         (async() => {
@@ -30,6 +53,7 @@ const Login = () => {
         setLoading(true);
         try {
             const response = await signInWithEmailAndPassword(auth, email, password);
+            setGlobUser(response.user.uid);
             console.log(response);
         } catch (error: any) {
             console.log(error);
@@ -43,7 +67,15 @@ const Login = () => {
         setLoading(true);
         try {
             const response = await createUserWithEmailAndPassword(auth, email, password);
-            console.log(response);
+            const uid = response.user.uid;
+            setGlobUser(uid);
+            console.log(globUser);
+            const targetChar = "@";
+            const index = email.indexOf(targetChar);
+            const name = index !== -1 ? email.slice(0, index) : email;
+            addUserWithCustomId(uid, name, email);
+            console.log(name + '' + email);
+            console.log(response); 
         } catch (error: any) {
             console.log(error);
             alert('Sign up failed' + error.message);
@@ -105,7 +137,7 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Login;
 
 const styles = StyleSheet.create({
     buttonContainer: {
