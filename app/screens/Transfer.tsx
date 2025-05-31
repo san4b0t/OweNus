@@ -1,8 +1,8 @@
-import { db } from '@/FirebaseConfig';
+import { db, FIREBASE_AUTH } from '@/FirebaseConfig';
 import { IdContext } from '@/Global/IdContext';
 import { UserDataContext } from '@/Global/UserDataContext';
 import { NavigationProp } from '@react-navigation/core';
-import { doc, increment, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, increment, query, updateDoc, where } from 'firebase/firestore';
 import React, { useContext, useState } from 'react'
 import { View, Text, Button, TextInput, StyleSheet, Keyboard } from 'react-native';
 
@@ -10,74 +10,97 @@ interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
-const Transfer = ({navigation}: RouterProps) => {
+const Transfer = ({ navigation }: RouterProps) => {
+  const [friendId, setFriendId] = useState('');
+  const [amount, setAmount] = useState('');
 
-    const { userData, setUserData } = useContext(UserDataContext);
-    const { globUser, setGlobUser} = useContext(IdContext);
-    const [ balance, setBalance ] = useState(userData.balance);
-    const [ trf, setTrf ] = useState('');
-    const [ receipient, setReceipient ] = useState('');
-  
-    const transferTo = async (collectionId: string, documentId: string, trfAmt: number) => {
-        const docRef = doc(db, collectionId, documentId);
-        try {
-          await updateDoc(docRef, {
-            balance: increment(trfAmt)
-          });
-        } catch (e) {
-          console.error("Error updating document: ", e);
-        }
-      }
-      
-      const transferFrom = async (collectionId: string, documentId: string, fieldsToUpdate: { [key: string]: number }) => {
-        const docRef = doc(db, collectionId, documentId);
-        setBalance(balance - parseFloat(trf))
-        try {
-          await updateDoc(docRef, fieldsToUpdate);
-        } catch (e) {
-          console.error("Error updating document: ", e);
-        }
-      }
+  const handleSettleUp = async () => {
+    try {
+      const user = FIREBASE_AUTH.currentUser;
+      if (!user) throw new Error('Not authenticated');
 
-      const transfer = (collectionId: string, senderId: string, receipientId: string, transferAmt: string) => {
-        transferTo(collectionId, receipientId, parseFloat(transferAmt));
-        transferFrom(collectionId, senderId, {balance: balance - parseFloat(transferAmt)});
-        setTrf('');
-        setReceipient('');
-        Keyboard.dismiss();
-      }
+      await addDoc(collection(db, 'transactions'), {
+        from: user.uid,
+        to: friendId,
+        amount: parseFloat(amount),
+        settledAt: new Date(),
+      });
+
+      // update balances
+      // Check if balance exists
+      const balanceQuery = query(
+        collection(db, 'balances'),
+        where('userId', '==', user.uid),
+        where('friendId', '==', friendId)
+      );
+
+      const snapshot = await getDocs(balanceQuery);
+
+      if (snapshot.empty) return; 
+
+      const doc = snapshot.docs[0];
+      await updateDoc(doc.ref, {
+      amount: doc.data().amount + parseFloat(amount)
+      });
+
+      const balanceQuery2 = query(
+        collection(db, 'balances'),
+        where('userId', '==', friendId),
+        where('friendId', '==', user.uid)
+      );
+
+      const snapshot2 = await getDocs(balanceQuery2);
+
+      if (snapshot2.empty) return;
+
+      const doc2 = snapshot2.docs[0];
+      await updateDoc(doc2.ref, {
+      amount: doc2.data().amount - parseFloat(amount)
+      });
+
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error settling up:', error);
+    }
+  };
 
   return (
-    <View>
-        <Text>Transfer Page</Text>
-        <Text>Balance: {balance}</Text>
-        <TextInput 
-                value={receipient} 
-                style={styles.input} 
-                placeholder='Transfer To' 
-                autoCapitalize='none' 
-                onChangeText={setReceipient}></TextInput>
-        <TextInput 
-                value={trf} 
-                keyboardType='numeric'
-                style={styles.input} 
-                placeholder='Transfer Amount' 
-                autoCapitalize='none' 
-                onChangeText={setTrf}></TextInput>
-        <Button title='Transfer' onPress={() => transfer('users', globUser, receipient, trf)}></Button>
+    <View style={styles.container}>
+      <Text style={styles.title}>Settle Up</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Friend's User ID"
+        value={friendId}
+        onChangeText={setFriendId}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Amount"
+        value={amount}
+        onChangeText={setAmount}
+        keyboardType="numeric"
+      />
+      <Button title="Settle Up" onPress={handleSettleUp} />
     </View>
-  )
-}
-
-export default Transfer;
+  );
+};
 
 const styles = StyleSheet.create({
-    input: {
-        marginVertical: 4,
-        height: 50,
-        borderWidth: 1,
-        borderRadius: 4,
-        padding: 10,
-        backgroundColor: "#fff",
-    },
-})
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+});
+
+export default Transfer;
