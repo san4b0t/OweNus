@@ -8,10 +8,13 @@ import AnimatedButton from '@/assets/components/AnimatedButton';
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 import { db } from '../../FirebaseConfig';
 import {IdProvider, IdContext} from '../../Global/IdContext';
+import { NavigationProp } from '@react-navigation/core';
 
+interface RouterProps {
+    navigation: NavigationProp<any, any>;
+}
 
-
-const Login = () => {
+const Login = ({ navigation }: RouterProps) => {
 
     const addUserWithCustomId = async (userId: string, name: string, email: string) => {
         try {
@@ -63,26 +66,26 @@ const Login = () => {
         }
     }
 
-    const signUp = async () => {
-        setLoading(true);
-        try {
-            const response = await createUserWithEmailAndPassword(auth, email, password);
-            const uid = response.user.uid;
-            setGlobUser(uid);
-            console.log(globUser);
-            const targetChar = "@";
-            const index = email.indexOf(targetChar);
-            const name = index !== -1 ? email.slice(0, index) : email;
-            addUserWithCustomId(uid, name, email);
-            console.log(name + '' + email);
-            console.log(response); 
-        } catch (error: any) {
-            console.log(error);
-            alert('Sign up failed' + error.message);
-        } finally {
-            setLoading(false);
-        }
-    }
+    // const signUp = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const response = await createUserWithEmailAndPassword(auth, email, password);
+    //         const uid = response.user.uid;
+    //         setGlobUser(uid);
+    //         console.log(globUser);
+    //         const targetChar = "@";
+    //         const index = email.indexOf(targetChar);
+    //         const name = index !== -1 ? email.slice(0, index) : email;
+    //         addUserWithCustomId(uid, name, email);
+    //         console.log(name + '' + email);
+    //         console.log(response); 
+    //     } catch (error: any) {
+    //         console.log(error);
+    //         alert('Sign up failed' + error.message);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
  
   return (
     <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
@@ -123,7 +126,7 @@ const Login = () => {
 
     <AnimatedButton 
       style={styles.signUpButton} 
-      onPress={signUp}
+      onPress={() => navigation.navigate('Sign Up')}
     >
       <Text style={styles.signUpButtonText}>sign up</Text>
     </AnimatedButton>

@@ -1,22 +1,16 @@
-import { db, FIREBASE_AUTH } from '@/FirebaseConfig';
-import { IdContext } from '@/Global/IdContext';
-import { UserDataContext } from '@/Global/UserDataContext';
-import { NavigationProp } from '@react-navigation/core';
-import { addDoc, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import React, { useContext, useState } from 'react'
-import { View, Text, Button, TextInput, StyleSheet, Keyboard } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { db } from '../../firebaseConfig';
+import { collection, addDoc, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { auth } from '../../firebaseConfig';
 
-interface RouterProps {
-    navigation: NavigationProp<any, any>;
-}
-
-const TopUpScreen = ({ navigation }: RouterProps) => {
+const SettleUpScreen = ({ navigation }) => {
   const [friendId, setFriendId] = useState('');
   const [amount, setAmount] = useState('');
 
   const handleSettleUp = async () => {
     try {
-      const user = FIREBASE_AUTH.currentUser;
+      const user = auth.currentUser;
       if (!user) throw new Error('Not authenticated');
 
       await addDoc(collection(db, 'transactions'), {
@@ -103,42 +97,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TopUpScreen;
-
-// const TopUp = ({navigation}: RouterProps) => {
-
-//     const { userData, setUserData } = useContext(UserDataContext);
-//     const { globUser, setGlobUser} = useContext(IdContext);
-//     const [ balance, setBalance ] = useState(userData.balance);
-//     const [ topUp, setTopUp ] = useState('');
-  
-//     const updateBalanceField = async (collectionId: string, documentId: string, fieldsToUpdate: { [key: string]: number }) => {
-//         const docRef = doc(db, collectionId, documentId);
-//         setBalance(balance + parseFloat(topUp))
-//         setTopUp('');
-//         Keyboard.dismiss();
-//         try {
-//           await updateDoc(docRef, fieldsToUpdate);
-//         } catch (e) {
-//           console.error("Error updating document: ", e);
-//         }
-//       }
-      
-
-//   return (
-//     <View>
-//         <Text>TopUp Page</Text>
-//         <Text>Balance: {balance}</Text>
-//         <TextInput 
-//                 value={topUp} 
-//                 keyboardType='numeric'
-//                 style={styles.input} 
-//                 placeholder='Top Up Amount' 
-//                 autoCapitalize='none' 
-//                 onChangeText={setTopUp}></TextInput>
-//         <Button title='Top Up' onPress={() => updateBalanceField('users', globUser, {balance: balance + parseFloat(topUp)})}></Button>
-//     </View>
-//   )
-// }
-
-// export default TopUp;
+export default SettleUpScreen;

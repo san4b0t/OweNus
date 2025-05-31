@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './app/screens/Login';
 import Details from './app/screens/Details';
 import Dashboard from './app/screens/Dashboard';
-import TopUp from './app/screens/TopUp';
+import TopUpScreen from './app/screens/TopUp';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { FIREBASE_AUTH } from './FirebaseConfig';
@@ -11,6 +11,9 @@ import {IdProvider, IdContext} from './Global/IdContext';
 import {UserDataProvider, UserDataContext} from './Global/UserDataContext';
 import { useContext } from 'react';
 import Transfer from './app/screens/Transfer';
+import SignupScreen from './app/screens/SignupScreen';
+import AddExpenseScreen from './app/screens/AddExpenseScreen';
+import FriendsScreen from './app/screens/FriendsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,8 +25,10 @@ function InsideLayout () {
     <InsideStack.Navigator>
       <InsideStack.Screen name="Dashboard" component={Dashboard} />
       <InsideStack.Screen name="details" component={Details} />
-      <InsideStack.Screen name="Top Up" component={TopUp} />
+      <InsideStack.Screen name="Top Up" component={TopUpScreen} />
       <InsideStack.Screen name="Transfer" component={Transfer} />
+      <InsideStack.Screen name="Add Expense" component={AddExpenseScreen} />
+      <InsideStack.Screen name="Friends" component={FriendsScreen} />
     </InsideStack.Navigator>
     </UserDataProvider>
   )
@@ -56,7 +61,7 @@ function MainApp() {
         { user ? (
           <Stack.Screen name='Inside' component={InsideLayout} options={{ headerShown: false}} />
         ) : (
-          <Stack.Screen name='Login' component={Login} options={{ headerShown: false}} />
+          <><Stack.Screen name='Login' component={Login} options={{ headerShown: false }} /><Stack.Screen name='Sign Up' component={SignupScreen} options={{ headerShown: false }} /></>
         )}
         
       </Stack.Navigator>
