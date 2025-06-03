@@ -25,7 +25,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
       await addDoc(collection(db, 'expenses'), {
         description,
         amount: parseFloat(amount),
-        paidBy: user.uid,
+        paidBy: user.displayName,
         participants: participantIds,
         createdAt: new Date(),
       });
@@ -107,7 +107,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Participant IDs (comma separated)"
+        placeholder="Participant usernames (comma separated)"
         value={participants}
         onChangeText={setParticipants}
       />

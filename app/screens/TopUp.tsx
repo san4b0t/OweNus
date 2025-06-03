@@ -26,8 +26,6 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
         settledAt: new Date(),
       });
 
-      // update balances
-      // Check if balance exists
       const balanceQuery = query(
         collection(db, 'balances'),
         where('userId', '==', user.uid),
@@ -60,13 +58,13 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
 
       navigation.goBack();
     } catch (error) {
-      console.error('Error settling up:', error);
+      console.error('Error topping up:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settle Up</Text>
+      <Text style={styles.title}>Top Up</Text>
       <TextInput
         style={styles.input}
         placeholder="Friend's User ID"
@@ -80,7 +78,7 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
         onChangeText={setAmount}
         keyboardType="numeric"
       />
-      <Button title="Settle Up" onPress={handleSettleUp} />
+      <Button title="Top Up" onPress={handleSettleUp} />
     </View>
   );
 };
@@ -104,41 +102,3 @@ const styles = StyleSheet.create({
 });
 
 export default TopUpScreen;
-
-// const TopUp = ({navigation}: RouterProps) => {
-
-//     const { userData, setUserData } = useContext(UserDataContext);
-//     const { globUser, setGlobUser} = useContext(IdContext);
-//     const [ balance, setBalance ] = useState(userData.balance);
-//     const [ topUp, setTopUp ] = useState('');
-  
-//     const updateBalanceField = async (collectionId: string, documentId: string, fieldsToUpdate: { [key: string]: number }) => {
-//         const docRef = doc(db, collectionId, documentId);
-//         setBalance(balance + parseFloat(topUp))
-//         setTopUp('');
-//         Keyboard.dismiss();
-//         try {
-//           await updateDoc(docRef, fieldsToUpdate);
-//         } catch (e) {
-//           console.error("Error updating document: ", e);
-//         }
-//       }
-      
-
-//   return (
-//     <View>
-//         <Text>TopUp Page</Text>
-//         <Text>Balance: {balance}</Text>
-//         <TextInput 
-//                 value={topUp} 
-//                 keyboardType='numeric'
-//                 style={styles.input} 
-//                 placeholder='Top Up Amount' 
-//                 autoCapitalize='none' 
-//                 onChangeText={setTopUp}></TextInput>
-//         <Button title='Top Up' onPress={() => updateBalanceField('users', globUser, {balance: balance + parseFloat(topUp)})}></Button>
-//     </View>
-//   )
-// }
-
-// export default TopUp;
