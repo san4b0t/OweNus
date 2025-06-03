@@ -85,6 +85,18 @@ const Dashboard = ({ navigation } : RouterProps) => {
         unsubscribeBalances();
       };
     }, []);
+
+    const getUserName = async (uid: string) => {
+      const userDocRef = doc(db, 'users', uid);
+      const userSnap = await getDoc(userDocRef);
+    
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        return data.name; 
+      } else {
+        throw new Error("User document not found in Firestore");
+      }
+    };
   
 
   return (
@@ -105,7 +117,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
               />
         
               <Text style={styles.subtitle}>Balances:</Text>
-              {Object.entries(balances).map(([friendId, amount]) => (
+              {Object.entries(balances).map(async ([friendId, amount]) => (
                 <Text key={friendId}>
                   {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount)}
                 </Text>
@@ -125,21 +137,21 @@ const Dashboard = ({ navigation } : RouterProps) => {
           label="Top Up"
           onPress={() => navigation.navigate('Top Up')}
         />
-        <ActionButton
+        {/* <ActionButton
           imageSource={require('@/assets/assets/images/details.png')}
           label="Details"
           onPress={() => navigation.navigate('details')}
-        />
+        /> */}
 
         <ActionButton
-          imageSource={require('@/assets/assets/images/details.png')}
+          imageSource={require('@/assets/assets/images/friends.png')}
           label="Friends"
           onPress={() => navigation.navigate('Friends')}
         />
         
 
         <ActionButton
-          imageSource={require('@/assets/assets/images/logout.png')}
+          imageSource={require('@/assets/assets/images/expenses.png')}
           label="Add Expense"
           onPress={() => navigation.navigate('Add Expense')}  
           
