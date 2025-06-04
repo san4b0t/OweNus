@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
 import { collection, addDoc, updateDoc, getDocs, where, query } from 'firebase/firestore';
 import { FIREBASE_AUTH, db } from '../../FirebaseConfig';
 import { NavigationProp } from '@react-navigation/core';
+import { LinearGradient } from 'expo-linear-gradient';
+import ActionButton from '@/assets/components/ActionButton';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -91,6 +93,8 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
 
   return (
     <View style={styles.container}>
+      <LinearGradient colors = {['rgb(157, 255, 252)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
+      <Image source={require('@/assets/assets/images/money-cash.gif')} style={styles.expense}/>
       <Text style={styles.title}>Add New Expense</Text>
       <TextInput
         style={styles.input}
@@ -111,19 +115,32 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         value={participants}
         onChangeText={setParticipants}
       />
-      <Button title="Add Expense" onPress={handleAddExpense} />
+      <ActionButton
+          imageSource={require('@/assets/assets/images/expenses.png')}
+          label="Add Expense"
+          onPress={handleAddExpense}
+          
+        />
+      </LinearGradient>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
+    marginTop: 220,
     marginBottom: 20,
+    color: '#00177d',
+    fontFamily: 'ZenDots',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   input: {
     height: 40,
@@ -131,6 +148,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
+    textAlign: 'center',
+    backgroundColor: 'white',
+    width: '90%',
+    alignSelf: 'center',
+    borderRadius: 10,
+  },
+  expense: {
+    position: 'absolute',
+    marginTop: 20,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
 });
 

@@ -45,6 +45,8 @@ const Login = ({ navigation }: RouterProps) => {
             await Font.loadAsync({
                 'PressStart2P': require('@/assets/assets/fonts/PressStart2P-Regular.ttf'),
                 'Orbitron': require('@/assets/assets/fonts/Orbitron.ttf'),
+                'Jersey25': require('@/assets/assets/fonts/Jersey25.ttf'),
+                'ZenDots': require('@/assets/assets/fonts/ZenDots.ttf'),
             });
             setFontLoaded(true);
         })();
@@ -88,7 +90,7 @@ const Login = ({ navigation }: RouterProps) => {
     // }
  
   return (
-    <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
+    <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
     <View style={styles.container}>
         <KeyboardAvoidingView behavior='padding' style = {styles.container}>
             <View style={styles.coinRow}>

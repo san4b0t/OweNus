@@ -4,7 +4,9 @@ import { UserDataContext } from '@/Global/UserDataContext';
 import { NavigationProp } from '@react-navigation/core';
 import { addDoc, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import React, { useContext, useState } from 'react'
-import { View, Text, Button, TextInput, StyleSheet, Keyboard } from 'react-native';
+import { View, Text, Button, TextInput, StyleSheet, Keyboard, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import ActionButton from '@/assets/components/ActionButton';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -63,6 +65,7 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
   };
 
   return (
+    <LinearGradient colors = {['rgb(157, 255, 252)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
     <View style={styles.container}>
       <Text style={styles.title}>Top Up</Text>
       <TextInput
@@ -78,8 +81,15 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
         onChangeText={setAmount}
         keyboardType="numeric"
       />
-      <Button title="Top Up" onPress={handleSettleUp} />
+      <ActionButton
+          imageSource={require('@/assets/assets/images/cash2.png')}
+          label="Settle Up"
+          onPress={handleSettleUp}
+          
+        />
+        <Image source={require('@/assets/assets/images/coin2.png')} style={styles.coin}/>
     </View>
+    </LinearGradient>
   );
 };
 
@@ -87,10 +97,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    
   },
   title: {
-    fontSize: 24,
+    fontFamily: 'ZenDots',
+    fontWeight: 'bold',
+    color: '#00177d',
+    fontSize: 32,
     marginBottom: 20,
+    alignSelf: 'center',
+    marginTop: 100,
   },
   input: {
     height: 40,
@@ -98,6 +114,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    textAlign: 'center',
+    fontSize: 16,
+  },
+  gradient: {
+    flex: 1,
+  },
+  coin: {
+    position: 'relative',
+    marginTop: 20,
   },
 });
 
