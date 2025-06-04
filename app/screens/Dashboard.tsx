@@ -100,11 +100,11 @@ const Dashboard = ({ navigation } : RouterProps) => {
   
 
   return (
-    <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
+    <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
       <View style={styles.infoCard}>
         <Text style={styles.header}>Welcome, {user?.displayName || 'User'}</Text>
         <Text style={styles.balance}> Balance:${userData?.balance||0}</Text>
-        <Text style={styles.subtitle}>Recent Expenses:</Text>
+        <Text style={styles.subtitle1}>Recent Expenses:</Text>
               <FlatList
                 data={expenses}
                 keyExtractor={item => item.id}
@@ -115,16 +115,15 @@ const Dashboard = ({ navigation } : RouterProps) => {
                   </View>
                 )}
               />
-        
-              <Text style={styles.subtitle}>Balances:</Text>
+              
+              <Text style={styles.subtitle2}>Balances:</Text>
               {Object.entries(balances).map(async ([friendId, amount]) => (
                 <Text key={friendId}>
                   {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount)}
                 </Text>
               ))}
       </View>
-
-
+      
       <View style={styles.verticalButtons}>
         <ActionButton
           imageSource={require('@/assets/assets/images/transfer.png')}
@@ -177,22 +176,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     borderRadius: 20,
     alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 10,
   },
   gradient: {
     flex: 1,
   },
   header: {
     fontFamily: 'Orbitron',
-    fontSize: 28,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: '800',
     color: '#000352',
     textAlign: 'center',
+    marginBottom: 'auto',
   },
   balance: {
-    fontFamily:'PressStart2P' ,
+    fontFamily:'Orbitron' ,
     fontSize: 24,
     color: '#001561',
     textAlign: 'center',
+    fontWeight: '500',
   },
   verticalButtons: {
     flexDirection: 'column',
@@ -202,18 +205,34 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 300,
     height: 300,
-    left: -100,
-    bottom: -100,
+    left: -140,
+    bottom: -120,
+    zIndex: -1, 
   },
-  subtitle: {
-    fontSize: 18,
+  subtitle1: {
+    fontFamily: 'orbitron',
+    fontSize: 20,
     marginTop: 20,
     marginBottom: 10,
+    fontWeight: 'semibold',
+    color: '#001561',
+  },
+  subtitle2: {
+    fontFamily: 'orbitron',
+    fontSize: 20,
+    marginTop: 5,
+    marginBottom: 10,
+    fontWeight: 'semibold',
+    color: '#001561',
   },
   expenseItem: {
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+  },
+  wallet: {
+    position: 'absolute',
+    zIndex: -1,
   },
 });
 

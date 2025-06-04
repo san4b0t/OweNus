@@ -14,6 +14,7 @@ import Transfer from './app/screens/Transfer';
 import SignupScreen from './app/screens/SignupScreen';
 import AddExpenseScreen from './app/screens/AddExpenseScreen';
 import FriendsScreen from './app/screens/FriendsScreen';
+import { StatusBar } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
