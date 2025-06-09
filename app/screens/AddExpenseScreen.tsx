@@ -20,23 +20,37 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
       const user = FIREBASE_AUTH.currentUser;
       if (!user) throw new Error('Not authenticated');
   
-      const participantIds = participants.split(',').map(p => p.trim());
-      const amountPerPerson = parseFloat(amount) / (participantIds.length || 1);
+      const participantNames = participants.split(',').map(p => p.trim());
+      const amountPerPerson = parseFloat(amount) / (participantNames.length || 1);
   
-      // Add expense
+      // add expense to the database
       await addDoc(collection(db, 'expenses'), {
         description,
         amount: parseFloat(amount),
-        paidBy: user.displayName,
-        participants: participantIds,
+        paidBy: user.uid,
+        paidByName: user.displayName,
+        participants: participantNames,
         createdAt: new Date(),
       });
   
-      // Update balances for each participant
-      for (const participantId of participantIds) {
+      // update balances for each participant
+      for (const participantName of participantNames) {
+
+        const userDoc = query(
+          collection(db, 'users'),
+          where('name', '==', participantName)
+        );
+
+        const userSnapshot = await getDocs(userDoc);
+        if (userSnapshot.empty) {
+          console.error(`User with name ${participantName} not found`);
+          continue;
+        }
+        const participantId = userSnapshot.docs[0].data().uid; 
+
         if (participantId === user.uid) continue;
         
-        // Check if balance exists
+        // check if balance exists between user and each participant in the expense
         const balanceQuery = query(
           collection(db, 'balances'),
           where('userId', '==', user.uid),
@@ -46,21 +60,23 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         const snapshot = await getDocs(balanceQuery);
         
         if (snapshot.empty) {
-          // Create new balance
+          // create new balance
           await addDoc(collection(db, 'balances'), {
             userId: user.uid,
+            userName: user.displayName,
             friendId: participantId,
+            friendName: participantName,
             amount: amountPerPerson
           });
         } else {
-          // Update existing balance
+          // update existing balance
           const doc = snapshot.docs[0];
           await updateDoc(doc.ref, {
           amount: doc.data().amount + amountPerPerson
           });
         }
         //create mirror balance
-        // Check if balance exists
+        //check if balance exists
         const balanceQuery2 = query(
           collection(db, 'balances'),
           where('userId', '==', participantId),
@@ -70,14 +86,16 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         const snapshot2 = await getDocs(balanceQuery2);
         
         if (snapshot2.empty) {
-          // Create new balance
+          // create new balance
           await addDoc(collection(db, 'balances'), {
             userId: participantId,
+            userName: participantName,
             friendId: user.uid,
+            friendName: user.displayName,
             amount: -1 * amountPerPerson
           });
         } else {
-          // Update existing balance
+          // update existing balance
           const doc = snapshot2.docs[0];
           await updateDoc(doc.ref, {
           amount: doc.data().amount - amountPerPerson

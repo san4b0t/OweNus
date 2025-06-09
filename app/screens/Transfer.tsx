@@ -14,6 +14,7 @@ interface RouterProps {
 
 const Transfer = ({ navigation }: RouterProps) => {
   const [friendId, setFriendId] = useState('');
+  const [friendName, setFriendName] = useState('');
   const [amount, setAmount] = useState('');
 
   const handleSettleUp = async () => {
@@ -23,21 +24,23 @@ const Transfer = ({ navigation }: RouterProps) => {
 
       await addDoc(collection(db, 'transactions'), {
         from: user.uid,
+        fromName: user.displayName,
         to: friendId,
+        toName: friendName,
         amount: parseFloat(amount),
         settledAt: new Date(),
       });
 
       // update balances
-      // Check if balance exists
+      
       const balanceQuery = query(
         collection(db, 'balances'),
         where('userId', '==', user.uid),
-        where('friendId', '==', friendId)
+        where('friendName', '==', friendName)
       );
 
       const snapshot = await getDocs(balanceQuery);
-
+      // check if balance exists
       if (snapshot.empty) return; 
 
       const doc = snapshot.docs[0];
@@ -45,9 +48,38 @@ const Transfer = ({ navigation }: RouterProps) => {
       amount: doc.data().amount + parseFloat(amount)
       });
 
+      //update user balance
+      const userQuery = query(
+        collection(db, 'users'),
+        where('uid', '==', user.uid),
+      );
+
+      const usersnapshot = await getDocs(userQuery);
+
+      if (usersnapshot.empty) return; 
+
+      const userdoc = usersnapshot.docs[0];
+      await updateDoc(userdoc.ref, {
+      balance: userdoc.data().balance - parseFloat(amount)
+      });
+
+      //update mirror balance
+
+      const friendDoc = query(
+        collection(db, 'users'),
+        where('name', '==', friendName),
+      );
+
+      const friendSnapshot = await getDocs(friendDoc);
+      if (friendSnapshot.empty) {
+        console.error(`User with name ${friendName} not found`);
+        return;
+      }
+      setFriendId(friendSnapshot.docs[0].data().uid);
+
       const balanceQuery2 = query(
         collection(db, 'balances'),
-        where('userId', '==', friendId),
+        where('userName', '==', friendName),
         where('friendId', '==', user.uid)
       );
 
@@ -60,6 +92,22 @@ const Transfer = ({ navigation }: RouterProps) => {
       amount: doc2.data().amount - parseFloat(amount)
       });
 
+      //update friend's balance
+      const friendQuery = query(
+        collection(db, 'users'),
+        where('uid', '==', friendSnapshot.docs[0].data().uid),  
+      );
+      
+      const friendDataSnapshot = await getDocs(friendQuery);
+
+      if (friendDataSnapshot.empty) return;
+
+      const frienddoc = friendDataSnapshot.docs[0];
+      await updateDoc(frienddoc.ref, {
+      balance: frienddoc.data().balance + parseFloat(amount)
+      });
+      
+
       navigation.goBack();
     } catch (error) {
       console.error('Error settling up:', error);
@@ -70,12 +118,12 @@ const Transfer = ({ navigation }: RouterProps) => {
     <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
     <View style={styles.container}>
       <Image source={require('@/assets/assets/images/coindropping1.png')} style={styles.coin1}/>
-      <Text style={styles.title}>Settle Up</Text>
+      <Text style={styles.title}>Transfer</Text>
       <TextInput
         style={styles.input}
         placeholder="Friend's User ID"
-        value={friendId}
-        onChangeText={setFriendId}
+        value={friendName}
+        onChangeText={setFriendName}
       />
       <TextInput
         style={styles.input}
@@ -86,7 +134,7 @@ const Transfer = ({ navigation }: RouterProps) => {
       />
       <ActionButton
           imageSource={require('@/assets/assets/images/moneybag.png')}
-          label="Settle Up"
+          label="Transfer"
           onPress={handleSettleUp}
         />
         <Image source={require('@/assets/assets/images/coindropping2.png')} style={styles.coin2}/>
