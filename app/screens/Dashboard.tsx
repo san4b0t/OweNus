@@ -58,7 +58,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
       // Fetch expenses
       const expensesQuery = query(
         collection(db, 'expenses'),
-        where('participants', 'array-contains', user.uid)
+        where('paidBy', '==', user.uid)
       );
   
       const unsubscribeExpenses = onSnapshot(expensesQuery, (snapshot) => {
@@ -70,12 +70,15 @@ const Dashboard = ({ navigation } : RouterProps) => {
       });
   
       // Fetch balances (simplified)
-      const balancesQuery = query(collection(db, 'balances'), where('userId', '==', user.uid));
+      const balancesQuery = query(
+        collection(db, 'balances'), 
+        where('userId', '==', user.uid),
+        where('amount', '!=', 0));
       const unsubscribeBalances = onSnapshot(balancesQuery, (snapshot) => {
         const balancesData: Record<string, number> = {};
         snapshot.forEach(doc => {
           const data = doc.data();
-          balancesData[data.friendId as string] = data.amount as number;
+          balancesData[data.friendName as string] = data.amount as number;
         });
         setBalances(balancesData);
       });
@@ -110,8 +113,8 @@ const Dashboard = ({ navigation } : RouterProps) => {
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
                   <View style={styles.expenseItem}>
-                    <Text>{item.description}: ${item.amount}</Text>
-                    <Text>Paid by: {item.paidBy}</Text>
+                    <Text>{item.description}: ${item.amount} | </Text>
+                    <Text>Paid by: {item.paidByName}</Text>
                   </View>
                 )}
               />
@@ -226,6 +229,8 @@ const styles = StyleSheet.create({
     color: '#001561',
   },
   expenseItem: {
+    display: 'flex',
+    flexDirection: 'row',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
