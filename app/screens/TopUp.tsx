@@ -13,49 +13,25 @@ interface RouterProps {
 }
 
 const TopUpScreen = ({ navigation }: RouterProps) => {
-  const [friendId, setFriendId] = useState('');
   const [amount, setAmount] = useState('');
 
-  const handleSettleUp = async () => {
+  const handleTopUp = async () => {
     try {
       const user = FIREBASE_AUTH.currentUser;
       if (!user) throw new Error('Not authenticated');
 
-      await addDoc(collection(db, 'transactions'), {
-        from: user.uid,
-        to: friendId,
-        amount: parseFloat(amount),
-        settledAt: new Date(),
-      });
-
-      const balanceQuery = query(
-        collection(db, 'balances'),
-        where('userId', '==', user.uid),
-        where('friendId', '==', friendId)
+      const userQuery = query(
+        collection(db, 'users'),
+        where('uid', '==', user.uid),
       );
 
-      const snapshot = await getDocs(balanceQuery);
+      const snapshot = await getDocs(userQuery);
 
       if (snapshot.empty) return; 
 
       const doc = snapshot.docs[0];
       await updateDoc(doc.ref, {
-      amount: doc.data().amount + parseFloat(amount)
-      });
-
-      const balanceQuery2 = query(
-        collection(db, 'balances'),
-        where('userId', '==', friendId),
-        where('friendId', '==', user.uid)
-      );
-
-      const snapshot2 = await getDocs(balanceQuery2);
-
-      if (snapshot2.empty) return;
-
-      const doc2 = snapshot2.docs[0];
-      await updateDoc(doc2.ref, {
-      amount: doc2.data().amount - parseFloat(amount)
+      balance: doc.data().balance + parseFloat(amount)
       });
 
       navigation.goBack();
@@ -70,12 +46,6 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
       <Text style={styles.title}>Top Up</Text>
       <TextInput
         style={styles.input}
-        placeholder="Friend's User ID"
-        value={friendId}
-        onChangeText={setFriendId}
-      />
-      <TextInput
-        style={styles.input}
         placeholder="Amount"
         value={amount}
         onChangeText={setAmount}
@@ -83,8 +53,8 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
       />
       <ActionButton
           imageSource={require('@/assets/assets/images/cash2.png')}
-          label="Settle Up"
-          onPress={handleSettleUp}
+          label="Top Up"
+          onPress={handleTopUp}
           
         />
         <Image source={require('@/assets/assets/images/coin2.png')} style={styles.coin}/>
