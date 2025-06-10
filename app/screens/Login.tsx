@@ -1,37 +1,18 @@
-import React, { useEffect, useState, useRef, createContext, useContext, useReducer } from 'react'
-import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, Image, TouchableOpacity, Animated } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react'
+import { View, Text, StyleSheet, TextInput, ActivityIndicator, KeyboardAvoidingView, Image, } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import * as Font from 'expo-font';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import AnimatedButton from '@/assets/components/AnimatedButton';
-import { collection, addDoc, doc, setDoc } from "firebase/firestore";
-import { db } from '../../FirebaseConfig';
-import {IdProvider, IdContext} from '../../Global/IdContext';
+import {IdContext} from '../../Global/IdContext';
 import { NavigationProp } from '@react-navigation/core';
+import { Auth } from '../services/AuthService';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
 const Login = ({ navigation }: RouterProps) => {
-
-    const addUserWithCustomId = async (userId: string, name: string, email: string) => {
-        try {
-          const userDocRef = doc(db, "users", userId);
-      
-          await setDoc(userDocRef, {
-            name: name,
-            email: email,
-            balance: 0
-          });
-      
-          console.log("Document successfully written with ID: ", userId);
-      
-        } catch (e) {
-          console.error("Error writing document: ", e);
-        }
-      }
 
     const [fontLoaded, setFontLoaded] = useState(false);
     const [email, setEmail] = useState('');
@@ -54,40 +35,22 @@ const Login = ({ navigation }: RouterProps) => {
 
     if(!fontLoaded) return null;
 
-    const signIn = async () => {
+    const handleSignIn = async () => {
+        if (!email || !password) {
+          alert('Please enter both email and password');
+          return;
+        }
+    
         setLoading(true);
         try {
-            const response = await signInWithEmailAndPassword(auth, email, password);
-            setGlobUser(response.user.uid);
-            console.log(response);
+          const user = await Auth.signIn(email, password);
+          setGlobUser(user.uid);
         } catch (error: any) {
-            console.log(error);
-            alert('Sign in failed' + error.message);
+          alert(`Sign in failed: ${error.message}`);
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    }
-
-    // const signUp = async () => {
-    //     setLoading(true);
-    //     try {
-    //         const response = await createUserWithEmailAndPassword(auth, email, password);
-    //         const uid = response.user.uid;
-    //         setGlobUser(uid);
-    //         console.log(globUser);
-    //         const targetChar = "@";
-    //         const index = email.indexOf(targetChar);
-    //         const name = index !== -1 ? email.slice(0, index) : email;
-    //         addUserWithCustomId(uid, name, email);
-    //         console.log(name + '' + email);
-    //         console.log(response); 
-    //     } catch (error: any) {
-    //         console.log(error);
-    //         alert('Sign up failed' + error.message);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }
+      };
  
   return (
     <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
@@ -121,7 +84,7 @@ const Login = ({ navigation }: RouterProps) => {
             <View style={styles.buttonContainer}>
                 <AnimatedButton 
       style={styles.loginButton} 
-      onPress={signIn}
+      onPress={handleSignIn}
     >
       <Text style={styles.buttonText}>login</Text>
     </AnimatedButton>
