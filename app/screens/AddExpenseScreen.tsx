@@ -32,6 +32,21 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         participants: participantNames,
         createdAt: new Date(),
       });
+
+      // update user balance
+      const userQuery = query(
+        collection(db, 'users'),
+        where('uid', '==', user.uid),
+      );
+
+      const usersnapshot = await getDocs(userQuery);
+
+      if (usersnapshot.empty) return; 
+
+      const userdoc = usersnapshot.docs[0];
+      await updateDoc(userdoc.ref, {
+      balance: userdoc.data().balance - parseFloat(amount)
+      });
   
       // update balances for each participant
       for (const participantName of participantNames) {
