@@ -1,7 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './app/screens/Login';
-import Details from './app/screens/Details';
 import Dashboard from './app/screens/Dashboard';
 import TopUpScreen from './app/screens/TopUp';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -25,7 +24,6 @@ function InsideLayout () {
     <UserDataProvider>
     <InsideStack.Navigator>
       <InsideStack.Screen name="Dashboard" component={Dashboard} />
-      <InsideStack.Screen name="details" component={Details} />
       <InsideStack.Screen name="Top Up" component={TopUpScreen} />
       <InsideStack.Screen name="Transfer" component={Transfer} />
       <InsideStack.Screen name="Add Expense" component={AddExpenseScreen} />
