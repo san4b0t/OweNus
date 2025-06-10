@@ -1,116 +1,81 @@
-import { db, FIREBASE_AUTH } from '@/FirebaseConfig';
-import { IdContext } from '@/Global/IdContext';
+import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { UserDataContext } from '@/Global/UserDataContext';
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
-import { addDoc, collection, doc, getDocs, increment, query, updateDoc, where } from 'firebase/firestore';
-import React, { useContext, useState } from 'react'
-import { View, Text, Button, TextInput, StyleSheet, Keyboard, Image } from 'react-native';
+import React, { useState } from 'react'
+import { View, Text, TextInput, StyleSheet, Alert, Image } from 'react-native';
 import ActionButton from '@/assets/components/ActionButton';
+import { TransferService } from '../services/TransferService';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
 const Transfer = ({ navigation }: RouterProps) => {
-  const [friendId, setFriendId] = useState('');
+
   const [friendName, setFriendName] = useState('');
   const [amount, setAmount] = useState('');
 
-  const handleSettleUp = async () => {
+  const handleTransfer = async () => {
+    if (!friendName || !amount) {
+      Alert.alert('Error', 'Please enter both friend name and amount');
+      return;
+    }
+
+    const amountNumber = parseFloat(amount);
+    if (isNaN(amountNumber)) {
+      Alert.alert('Error', 'Please enter a valid amount');
+      return;
+    }
+
     try {
       const user = FIREBASE_AUTH.currentUser;
-      if (!user) throw new Error('Not authenticated');
+      if (!user || !user.displayName) throw new Error('Not authenticated');
 
-      await addDoc(collection(db, 'transactions'), {
-        from: user.uid,
-        fromName: user.displayName,
-        to: friendId,
-        toName: friendName,
-        amount: parseFloat(amount),
-        settledAt: new Date(),
-      });
-
-      // update balances
+      // get friend data
+      const friendDoc = await TransferService.findUserByName(friendName);
+      const friendData = friendDoc.data();
       
-      const balanceQuery = query(
-        collection(db, 'balances'),
-        where('userId', '==', user.uid),
-        where('friendName', '==', friendName)
+      // create transaction in the database
+      await TransferService.createTransaction(
+        user.uid,
+        friendData.uid,
+        user.displayName,
+        friendName,
+        amountNumber
       );
 
-      const snapshot = await getDocs(balanceQuery);
-      // check if balance exists
-      if (snapshot.empty) return; 
+      //update balances
+      await Promise.all([
+        // update sender's balance
+        TransferService.updateUserBalance(user.uid, -amountNumber),
+        // update receiver's balance
+        TransferService.updateUserBalance(friendData.uid, amountNumber),
+        // update balance records both ways
+        TransferService.updateBalanceRecord(
+          user.uid,
+          friendData.uid,
+          user.displayName,
+          friendName,
+          amountNumber
+        ),
+        TransferService.updateBalanceRecord(
+          friendData.uid,
+          user.uid,
+          friendName,
+          user.displayName,
+          -amountNumber
+        )
+      ]);
 
-      const doc = snapshot.docs[0];
-      await updateDoc(doc.ref, {
-      amount: doc.data().amount + parseFloat(amount)
-      });
-
-      //update user balance
-      const userQuery = query(
-        collection(db, 'users'),
-        where('uid', '==', user.uid),
+      Alert.alert(
+        'Success', 
+        `Successfully transferred $${amountNumber.toFixed(2)} to ${friendName}`,
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
-
-      const usersnapshot = await getDocs(userQuery);
-
-      if (usersnapshot.empty) return; 
-
-      const userdoc = usersnapshot.docs[0];
-      await updateDoc(userdoc.ref, {
-      balance: userdoc.data().balance - parseFloat(amount)
-      });
-
-      //update mirror balance
-
-      const friendDoc = query(
-        collection(db, 'users'),
-        where('name', '==', friendName),
-      );
-
-      const friendSnapshot = await getDocs(friendDoc);
-      if (friendSnapshot.empty) {
-        console.error(`User with name ${friendName} not found`);
-        return;
-      }
-      setFriendId(friendSnapshot.docs[0].data().uid);
-
-      const balanceQuery2 = query(
-        collection(db, 'balances'),
-        where('userName', '==', friendName),
-        where('friendId', '==', user.uid)
-      );
-
-      const snapshot2 = await getDocs(balanceQuery2);
-
-      if (snapshot2.empty) return;
-
-      const doc2 = snapshot2.docs[0];
-      await updateDoc(doc2.ref, {
-      amount: doc2.data().amount - parseFloat(amount)
-      });
-
-      //update friend's balance
-      const friendQuery = query(
-        collection(db, 'users'),
-        where('uid', '==', friendSnapshot.docs[0].data().uid),  
-      );
-      
-      const friendDataSnapshot = await getDocs(friendQuery);
-
-      if (friendDataSnapshot.empty) return;
-
-      const frienddoc = friendDataSnapshot.docs[0];
-      await updateDoc(frienddoc.ref, {
-      balance: frienddoc.data().balance + parseFloat(amount)
-      });
-      
-
-      navigation.goBack();
-    } catch (error) {
-      console.error('Error settling up:', error);
+    } catch (error: any) {
+      Alert.alert('Transfer Failed', error.message);
+      console.error('Transfer error:', error);
     }
   };
 
@@ -121,7 +86,7 @@ const Transfer = ({ navigation }: RouterProps) => {
       <Text style={styles.title}>Transfer</Text>
       <TextInput
         style={styles.input}
-        placeholder="Friend's User ID"
+        placeholder="Friend's Username"
         value={friendName}
         onChangeText={setFriendName}
       />
@@ -135,7 +100,7 @@ const Transfer = ({ navigation }: RouterProps) => {
       <ActionButton
           imageSource={require('@/assets/assets/images/moneybag.png')}
           label="Transfer"
-          onPress={handleSettleUp}
+          onPress={handleTransfer}
         />
         <Image source={require('@/assets/assets/images/coindropping2.png')} style={styles.coin2}/>
     

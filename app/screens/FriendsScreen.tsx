@@ -35,7 +35,7 @@ const FriendsScreen = ({ navigation }: RouterProps) => {
       const user = FIREBASE_AUTH.currentUser;
       if (!user) return;
 
-      // Find user by email
+      // find user by email
       const usersQuery = query(
         collection(db, 'users'),
         where('email', '==', searchEmail)
@@ -49,7 +49,7 @@ const FriendsScreen = ({ navigation }: RouterProps) => {
 
       const friend = snapshot.docs[0].data();
       
-      // Create friendship in both directions
+      // create friendship in both directions
       await addDoc(collection(db, 'friendships'), {
         userId: user.uid,
         friendId: friend.uid,
