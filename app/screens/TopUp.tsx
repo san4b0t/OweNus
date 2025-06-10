@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { View, Text, Alert, TextInput, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionButton from '@/assets/components/ActionButton';
-import { UserService } from '../services/UserService';
+import { TopUp } from '../services/TopUpService';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -20,7 +20,7 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
 
     try {
       const amountNumber = parseFloat(amount);
-      await UserService.updateUserBalance(amountNumber);
+      await TopUp.updateUserBalance(amountNumber);
       navigation.goBack();
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to top up balance');

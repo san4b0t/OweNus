@@ -2,7 +2,7 @@
 import { db, FIREBASE_AUTH } from '../../FirebaseConfig';
 import { collection, getDocs, query, updateDoc, where } from 'firebase/firestore';
 
-export const UserService = {
+export const TopUp = {
   async getCurrentUserDoc() {
     const user = FIREBASE_AUTH.currentUser;
     if (!user) throw new Error('Not authenticated');
