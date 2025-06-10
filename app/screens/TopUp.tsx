@@ -1,12 +1,9 @@
-import { db, FIREBASE_AUTH } from '@/FirebaseConfig';
-import { IdContext } from '@/Global/IdContext';
-import { UserDataContext } from '@/Global/UserDataContext';
 import { NavigationProp } from '@react-navigation/core';
-import { addDoc, collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import React, { useContext, useState } from 'react'
-import { View, Text, Button, TextInput, StyleSheet, Keyboard, Image } from 'react-native';
+import React, { useState } from 'react'
+import { View, Text, Alert, TextInput, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionButton from '@/assets/components/ActionButton';
+import { UserService } from '../services/UserService';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -16,27 +13,18 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
   const [amount, setAmount] = useState('');
 
   const handleTopUp = async () => {
+    if (!amount || isNaN(parseFloat(amount))) {
+      Alert.alert('Invalid Amount', 'Please enter a valid number');
+      return;
+    }
+
     try {
-      const user = FIREBASE_AUTH.currentUser;
-      if (!user) throw new Error('Not authenticated');
-
-      const userQuery = query(
-        collection(db, 'users'),
-        where('uid', '==', user.uid),
-      );
-
-      const snapshot = await getDocs(userQuery);
-
-      if (snapshot.empty) return; 
-
-      const doc = snapshot.docs[0];
-      await updateDoc(doc.ref, {
-      balance: doc.data().balance + parseFloat(amount)
-      });
-
+      const amountNumber = parseFloat(amount);
+      await UserService.updateUserBalance(amountNumber);
       navigation.goBack();
-    } catch (error) {
-      console.error('Error topping up:', error);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to top up balance');
+      console.error('TopUp error:', error);
     }
   };
 

@@ -1,12 +1,9 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, Image, StatusBar } from 'react-native';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { addDoc, collection } from 'firebase/firestore';
-import { FIREBASE_AUTH, db } from '../../FirebaseConfig';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, Alert, Image } from 'react-native';
 import { NavigationProp } from '@react-navigation/core';
-import { IdContext } from '@/Global/IdContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import AnimatedButton from '@/assets/components/AnimatedButton';
+import { Auth } from '../services/AuthService';
 
 
 interface RouterProps {
@@ -14,37 +11,21 @@ interface RouterProps {
 }
 
 const SignupScreen = ({ navigation }: RouterProps) => {
-   const { globUser, setGlobUser } = useContext(IdContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
   const handleSignup = async () => {
-    try {
-
-      const userCredential = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
-
-      await updateProfile(userCredential.user, {
-        displayName: name,
-      });
-  
-      
-      console.log('Display name is now:', userCredential.user.displayName);
-
-      await addDoc(collection(db, 'users'), {
-        uid: userCredential.user.uid,
-        name,
-        email,
-        balance: 0,
-        createdAt: new Date(),
-      });
-  
-      console.log('User registered successfully');
-      
-      //navigation.navigate('Dashboard');
-    } catch (error) {
-      Alert.alert('Error', (error as Error).message);
+    if (!name || !email || !password) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
     }
+
+    try {
+      await Auth.signUp(email, password, name);
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    } 
   };
 
   return (
@@ -88,6 +69,8 @@ const SignupScreen = ({ navigation }: RouterProps) => {
       </>
   );
 };
+
+export default SignupScreen;
 
 const styles = StyleSheet.create({
   locker: {
@@ -145,7 +128,7 @@ const styles = StyleSheet.create({
     width: '100%',            
     height: 40,
     borderColor: 'grey',
-    backgroundColor: 'background',
+    backgroundColor: 'white',
     borderWidth: 1,
     marginBottom: 20,         
     paddingHorizontal: 10,    
@@ -156,5 +139,3 @@ const styles = StyleSheet.create({
     flex: 1,                  
   },
 });
-
-export default SignupScreen;
