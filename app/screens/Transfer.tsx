@@ -12,123 +12,6 @@ interface RouterProps {
 }
 
 const Transfer = ({ navigation }: RouterProps) => {
-  // const [friendName, setFriendName] = useState('');
-  // const [amount, setAmount] = useState('');
-
-  // const handleSettleUp = async () => {
-  //   try {
-  //     const user = FIREBASE_AUTH.currentUser;
-  //     if (!user) throw new Error('Not authenticated');
-
-  //     const friendDoc = query(
-  //       collection(db, 'users'),
-  //       where('name', '==', friendName),
-  //     );
-
-  //     const friendSnapshot = await getDocs(friendDoc);
-  //     if (friendSnapshot.empty) {
-  //       console.error(`User with name ${friendName} not found`);
-  //       return;
-  //     }
-  //     const friendId = friendSnapshot.docs[0].data().uid;
-
-  //     await addDoc(collection(db, 'transactions'), {
-  //       from: user.uid,
-  //       fromName: user.displayName,
-  //       to: friendId,
-  //       toName: friendName,
-  //       amount: parseFloat(amount),
-  //       settledAt: new Date(),
-  //     });
-
-  //     // update balances
-      
-  //     const balanceQuery = query(
-  //       collection(db, 'balances'),
-  //       where('userId', '==', user.uid),
-  //       where('friendName', '==', friendName)
-  //     );
-
-  //     const snapshot = await getDocs(balanceQuery);
-  //     // check if balance exists
-  //     if (snapshot.empty) {
-  //       // create new balance
-  //       await addDoc(collection(db, 'balances'), {
-  //         userId: user.uid,
-  //         userName: user.displayName,
-  //         friendId: friendId,
-  //         friendName: friendName,
-  //         amount: parseFloat(amount)
-  //       });
-  //     } else {
-  //       const doc = snapshot.docs[0];
-  //       await updateDoc(doc.ref, {
-  //         amount: doc.data().amount + parseFloat(amount)
-  //     });
-  //     }
-
-  //     //update user balance
-  //     const userQuery = query(
-  //       collection(db, 'users'),
-  //       where('uid', '==', user.uid),
-  //     );
-
-  //     const usersnapshot = await getDocs(userQuery);
-
-  //     if (usersnapshot.empty) return; 
-
-  //     const userdoc = usersnapshot.docs[0];
-  //     await updateDoc(userdoc.ref, {
-  //     balance: userdoc.data().balance - parseFloat(amount)
-  //     });
-
-  //     //update mirror balance
-
-  //     const balanceQuery2 = query(
-  //       collection(db, 'balances'),
-  //       where('userName', '==', friendName),
-  //       where('friendId', '==', user.uid)
-  //     );
-
-  //     const snapshot2 = await getDocs(balanceQuery2);
-
-  //     if (snapshot2.empty) {
-  //       // create new balance
-  //       await addDoc(collection(db, 'balances'), {
-  //         userId: friendId,
-  //         userName: friendName,
-  //         friendId: user.uid,
-  //         friendName: user.displayName,
-  //         amount: -1 *parseFloat(amount)
-  //       });
-  //     } else {
-  //       const doc2 = snapshot2.docs[0];
-  //       await updateDoc(doc2.ref, {
-  //         amount: doc2.data().amount - parseFloat(amount)
-  //       });
-  //     }
-
-  //     //update friend's balance
-  //     const friendQuery = query(
-  //       collection(db, 'users'),
-  //       where('uid', '==', friendSnapshot.docs[0].data().uid),  
-  //     );
-      
-  //     const friendDataSnapshot = await getDocs(friendQuery);
-
-  //     if (friendDataSnapshot.empty) return;
-
-  //     const frienddoc = friendDataSnapshot.docs[0];
-  //     await updateDoc(frienddoc.ref, {
-  //     balance: frienddoc.data().balance + parseFloat(amount)
-  //     });
-      
-
-  //     navigation.goBack();
-  //   } catch (error) {
-  //     console.error('Error settling up:', error);
-  //   }
-  // };
 
   const [friendName, setFriendName] = useState('');
   const [amount, setAmount] = useState('');
@@ -149,11 +32,11 @@ const Transfer = ({ navigation }: RouterProps) => {
       const user = FIREBASE_AUTH.currentUser;
       if (!user || !user.displayName) throw new Error('Not authenticated');
 
-      // Find friend
+      // get friend data
       const friendDoc = await TransferService.findUserByName(friendName);
       const friendData = friendDoc.data();
       
-      // Create transaction
+      // create transaction in the database
       await TransferService.createTransaction(
         user.uid,
         friendData.uid,
@@ -162,13 +45,13 @@ const Transfer = ({ navigation }: RouterProps) => {
         amountNumber
       );
 
-      // Update balances
+      //update balances
       await Promise.all([
-        // Update sender's balance
+        // update sender's balance
         TransferService.updateUserBalance(user.uid, -amountNumber),
-        // Update receiver's balance
+        // update receiver's balance
         TransferService.updateUserBalance(friendData.uid, amountNumber),
-        // Update balance records
+        // update balance records both ways
         TransferService.updateBalanceRecord(
           user.uid,
           friendData.uid,

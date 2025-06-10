@@ -36,21 +36,21 @@ const Login = ({ navigation }: RouterProps) => {
     if(!fontLoaded) return null;
 
     const handleSignIn = async () => {
-        if (!email || !password) {
-          alert('Please enter both email and password');
-          return;
-        }
-    
-        setLoading(true);
-        try {
-          const user = await Auth.signIn(email, password);
-          setGlobUser(user.uid);
-        } catch (error: any) {
-          alert(`Sign in failed: ${error.message}`);
-        } finally {
-          setLoading(false);
-        }
-      };
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+    }
+
+    setLoading(true);
+    try {
+        const user = await Auth.signIn(email, password);
+        setGlobUser(user.uid);
+    } catch (error: any) {
+        alert(`Sign in failed: ${error.message}`);
+    } finally {
+        setLoading(false);
+    }
+    };
  
   return (
     <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>

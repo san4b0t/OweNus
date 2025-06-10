@@ -1,126 +1,49 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
-import { collection, addDoc, updateDoc, getDocs, where, query } from 'firebase/firestore';
-import { FIREBASE_AUTH, db } from '../../FirebaseConfig';
+import { View, Text, TextInput, Alert, StyleSheet, Image } from 'react-native';
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionButton from '@/assets/components/ActionButton';
+import { AddExpenseService } from '../services/AddExpenseService';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
 const AddExpenseScreen = ({ navigation }: RouterProps) => {
+
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [participants, setParticipants] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleAddExpense = async () => {
+    // input validation
+    if (!description || !amount || !participants) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+
+    const amountNumber = parseFloat(amount);
+    if (isNaN(amountNumber) || amountNumber <= 0) {
+      Alert.alert('Error', 'Please enter a valid amount');
+      return;
+    }
+
+    const participantNames = participants.split(',').map(p => p.trim()).filter(p => p !== '');
+    if (participantNames.length === 0) {
+      Alert.alert('Error', 'Please add at least one participant');
+      return;
+    }
+
+    setIsProcessing(true);
     try {
-      const user = FIREBASE_AUTH.currentUser;
-      if (!user) throw new Error('Not authenticated');
-  
-      const participantNames = participants.split(',').map(p => p.trim());
-      const amountPerPerson = parseFloat(amount) / (participantNames.length || 1);
-  
-      // add expense to the database
-      await addDoc(collection(db, 'expenses'), {
-        description,
-        amount: parseFloat(amount),
-        paidBy: user.uid,
-        paidByName: user.displayName,
-        participants: participantNames,
-        createdAt: new Date(),
-      });
-
-      // update user balance
-      const userQuery = query(
-        collection(db, 'users'),
-        where('uid', '==', user.uid),
-      );
-
-      const usersnapshot = await getDocs(userQuery);
-
-      if (usersnapshot.empty) return; 
-
-      const userdoc = usersnapshot.docs[0];
-      await updateDoc(userdoc.ref, {
-      balance: userdoc.data().balance - parseFloat(amount)
-      });
-  
-      // update balances for each participant
-      for (const participantName of participantNames) {
-
-        const userDoc = query(
-          collection(db, 'users'),
-          where('name', '==', participantName)
-        );
-
-        const userSnapshot = await getDocs(userDoc);
-        if (userSnapshot.empty) {
-          console.error(`User with name ${participantName} not found`);
-          continue;
-        }
-        const participantId = userSnapshot.docs[0].data().uid; 
-
-        if (participantId === user.uid) continue;
-        
-        // check if balance exists between user and each participant in the expense
-        const balanceQuery = query(
-          collection(db, 'balances'),
-          where('userId', '==', user.uid),
-          where('friendId', '==', participantId)
-        );
-        
-        const snapshot = await getDocs(balanceQuery);
-        
-        if (snapshot.empty) {
-          // create new balance
-          await addDoc(collection(db, 'balances'), {
-            userId: user.uid,
-            userName: user.displayName,
-            friendId: participantId,
-            friendName: participantName,
-            amount: amountPerPerson
-          });
-        } else {
-          // update existing balance
-          const doc = snapshot.docs[0];
-          await updateDoc(doc.ref, {
-          amount: doc.data().amount + amountPerPerson
-          });
-        }
-        //create mirror balance
-        //check if balance exists
-        const balanceQuery2 = query(
-          collection(db, 'balances'),
-          where('userId', '==', participantId),
-          where('friendId', '==', user.uid)
-        );
-        
-        const snapshot2 = await getDocs(balanceQuery2);
-        
-        if (snapshot2.empty) {
-          // create new balance
-          await addDoc(collection(db, 'balances'), {
-            userId: participantId,
-            userName: participantName,
-            friendId: user.uid,
-            friendName: user.displayName,
-            amount: -1 * amountPerPerson
-          });
-        } else {
-          // update existing balance
-          const doc = snapshot2.docs[0];
-          await updateDoc(doc.ref, {
-          amount: doc.data().amount - amountPerPerson
-          });
-        }
-      }
-  
+      await AddExpenseService.createExpense(description, amountNumber, participantNames);
       navigation.goBack();
-    } catch (error) {
-      console.error('Error adding expense:', error);
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+      console.error('Add expense error:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 

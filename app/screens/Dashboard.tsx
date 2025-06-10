@@ -69,7 +69,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
         setExpenses(expensesData);
       });
   
-      // Fetch balances (simplified)
+      // fetch balances owed to and from other users
       const balancesQuery = query(
         collection(db, 'balances'), 
         where('userId', '==', user.uid),
@@ -88,19 +88,6 @@ const Dashboard = ({ navigation } : RouterProps) => {
         unsubscribeBalances();
       };
     }, []);
-
-    const getUserName = async (uid: string) => {
-      const userDocRef = doc(db, 'users', uid);
-      const userSnap = await getDoc(userDocRef);
-    
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        return data.name; 
-      } else {
-        throw new Error("User document not found in Firestore");
-      }
-    };
-  
 
   return (
     <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
