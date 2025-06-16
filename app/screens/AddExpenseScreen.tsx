@@ -90,7 +90,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         value={participants}
         onChangeText={setParticipants}
       />
-      <TouchableOpacity style={styles.dateInput} onPress={() =>{showPicker}}>
+      <TouchableOpacity style={styles.dateInput} onPress={showPicker}>
         <Text style={styles.dateText}>
           Deadline: {deadline.toLocaleDateString()}
         </Text>
