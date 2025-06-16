@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, Alert, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionButton from '@/assets/components/ActionButton';
 import { AddExpenseService } from '../services/AddExpenseService';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -15,11 +16,18 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
   const [amount, setAmount] = useState('');
   const [participants, setParticipants] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [deadline, setDeadline] = useState(new Date()); 
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleAddExpense = async () => {
     // input validation
     if (!description || !amount || !participants) {
       Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+
+    if (deadline < new Date()) {
+      Alert.alert('Error', 'Deadline cannot be in the past');
       return;
     }
 
@@ -37,7 +45,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
 
     setIsProcessing(true);
     try {
-      await AddExpenseService.createExpense(description, amountNumber, participantNames);
+      await AddExpenseService.createExpense(description, amountNumber, participantNames,deadline);
       navigation.goBack();
     } catch (error: any) {
       Alert.alert('Error', error.message);
@@ -45,6 +53,17 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if(selectedDate) {
+      setDeadline(selectedDate);
+    }
+  };
+
+  const showPicker = () => {
+    setShowDatePicker(true);
   };
 
   return (
@@ -71,6 +90,21 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         value={participants}
         onChangeText={setParticipants}
       />
+      <TouchableOpacity style={styles.dateInput} onPress={() =>{showPicker}}>
+        <Text style={styles.dateText}>
+          Deadline: {deadline.toLocaleDateString()}
+        </Text>
+      </TouchableOpacity>
+        
+        {showDatePicker && (
+          <DateTimePicker
+            value={deadline}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
+            minimumDate={new Date()}
+          />
+        )}
       <ActionButton
           imageSource={require('@/assets/assets/images/expenses.png')}
           label="Add Expense"
@@ -115,6 +149,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignSelf: 'center',
     marginBottom: 20,
+  },
+   dateInput: {
+    height: 40,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '90%',
+    alignSelf: 'center',
+  },
+  dateText: {
+    color: '#00177d',
+    fontWeight: 'bold',
   },
 });
 

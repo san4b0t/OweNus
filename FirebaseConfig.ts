@@ -15,13 +15,13 @@ import {
 } from '@env';
 
 const firebaseConfig = {
-  apiKey: FIREBASE_API_KEY,
-  authDomain: FIREBASE_AUTH_DOMAIN,
-  projectId: FIREBASE_PROJECT_ID,
-  storageBucket: FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-  appId: FIREBASE_APP_ID,
-  measurementId: FIREBASE_MEASUREMENT_ID,
+  apiKey: "AIzaSyDjl1aYBZ_IfT36fMTuiVJGo5LIPnS0B6o",
+  authDomain: "owetest-edfc7.firebaseapp.com",
+  projectId: "owetest-edfc7",
+  storageBucket: "owetest-edfc7.firebasestorage.app",
+  messagingSenderId: "783199309926",
+  appId: "1:783199309926:web:d8e325893bbaf4a18a9da7",
+  measurementId: "G-08T2YW5MB9",
 };
 
 const FIREBASE_APP = initializeApp(firebaseConfig);
