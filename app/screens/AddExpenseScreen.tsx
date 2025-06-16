@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, Alert, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionButton from '@/assets/components/ActionButton';
 import { AddExpenseService } from '../services/AddExpenseService';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DatePickerComponent from '@/assets/components/DatePickerComponent';
+import { DateContext } from '@/Global/DateContext';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
 const AddExpenseScreen = ({ navigation }: RouterProps) => {
+  const { deadline, setDeadline } = useContext(DateContext);
 
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [participants, setParticipants] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [deadline, setDeadline] = useState(new Date()); 
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleAddExpense = async () => {
@@ -55,16 +57,16 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
     }
   };
 
-  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if(selectedDate) {
-      setDeadline(selectedDate);
-    }
-  };
+  // const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  //   setShowDatePicker(false);
+  //   if(selectedDate) {
+  //     setDeadline(selectedDate);
+  //   }
+  // };
 
-  const showPicker = () => {
-    setShowDatePicker(true);
-  };
+  // const showPicker = () => {
+  //   setShowDatePicker(true);
+  // };
 
   return (
     <View style={styles.container}>
@@ -90,7 +92,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         value={participants}
         onChangeText={setParticipants}
       />
-      <TouchableOpacity style={styles.dateInput} onPress={showPicker}>
+      {/* <TouchableOpacity style={styles.dateInput} onPress={showPicker}>
         <Text style={styles.dateText}>
           Deadline: {deadline.toLocaleDateString()}
         </Text>
@@ -104,7 +106,8 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
             onChange={handleDateChange}
             minimumDate={new Date()}
           />
-        )}
+        )} */}
+      <DatePickerComponent/>
       <ActionButton
           imageSource={require('@/assets/assets/images/expenses.png')}
           label="Add Expense"
@@ -115,6 +118,8 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
     </View>
   );
 };
+
+export default AddExpenseScreen;
 
 const styles = StyleSheet.create({
   gradient: {
@@ -166,4 +171,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddExpenseScreen;
