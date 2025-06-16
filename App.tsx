@@ -8,12 +8,12 @@ import { useEffect, useState } from 'react';
 import { FIREBASE_AUTH } from './FirebaseConfig';
 import {IdProvider, IdContext} from './Global/IdContext';
 import {UserDataProvider, UserDataContext} from './Global/UserDataContext';
+import { DateContext, DateProvider} from './Global/DateContext';
 import { useContext } from 'react';
 import Transfer from './app/screens/Transfer';
 import SignupScreen from './app/screens/SignupScreen';
 import AddExpenseScreen from './app/screens/AddExpenseScreen';
 import FriendsScreen from './app/screens/FriendsScreen';
-import { StatusBar } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +21,7 @@ const InsideStack = createNativeStackNavigator();
 
 function InsideLayout () {
   return (
+    <DateProvider>
     <UserDataProvider>
     <InsideStack.Navigator>
       <InsideStack.Screen name="Dashboard" component={Dashboard} />
@@ -30,6 +31,8 @@ function InsideLayout () {
       <InsideStack.Screen name="Friends" component={FriendsScreen} />
     </InsideStack.Navigator>
     </UserDataProvider>
+    </DateProvider>
+    
   )
 }
 

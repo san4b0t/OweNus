@@ -14,5 +14,5 @@
   "include": [
     "**/*.ts",
     "**/*.tsx"
-, "assets/components/AnimatedButton.js"  ]
+, "assets/components/AnimatedButton.js", "assets/components/DatePickerComponent.js", "assets/components/DatePickerComponent.js"  ]
 }
