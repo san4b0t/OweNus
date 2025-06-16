@@ -1,12 +1,19 @@
 // src/services/expenseService.ts
 import { db, FIREBASE_AUTH } from '@/FirebaseConfig';
-import { addDoc, collection, getDocs, query, updateDoc, where, increment } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, updateDoc, where, increment, serverTimestamp, Timestamp } from 'firebase/firestore';
+
 
 export const AddExpenseService = {
-  async createExpense(description: string, amount: number, participantNames: string[]) {
+  async createExpense(description: string, amount: number, participantNames: string[], deadlineDate: Date) {
     const user = FIREBASE_AUTH.currentUser;
     if (!user || !user.displayName) throw new Error('Not authenticated');
 
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0'); 
+    const year = now.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
+    const deadlineTimestamp = Timestamp.fromDate(deadlineDate);
     // add expense to db
     const expenseRef = await addDoc(collection(db, 'expenses'), {
       description,
@@ -14,7 +21,11 @@ export const AddExpenseService = {
       paidBy: user.uid,
       paidByName: user.displayName,
       participants: participantNames,
-      createdAt: new Date(),
+      createdAt: serverTimestamp(),
+      date: formattedDate, 
+      time: now.toLocaleTimeString(),
+      deadline: deadlineTimestamp, 
+      status: 'pending'
     });
 
     // update user balance as they pay for the expense
