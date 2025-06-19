@@ -46,48 +46,48 @@ const Dashboard = ({ navigation } : RouterProps) => {
   }, [globUser]);
 
   const [expenses, setExpenses] = useState<{ id: string; [key: string]: any }[]>([]);
-    const [balances, setBalances] = useState<Record<string, number>>({});
+  const [balances, setBalances] = useState<Record<string, number>>({});
   
-    useEffect(() => {
-      const user = FIREBASE_AUTH.currentUser;
-    if (!user) {
-      console.log('No authenticated user');
-      return;
-    }
-  
-      // Fetch expenses
-      const expensesQuery = query(
-        collection(db, 'expenses'),
-        where('paidBy', '==', user.uid)
-      );
-  
-      const unsubscribeExpenses = onSnapshot(expensesQuery, (snapshot) => {
-        const expensesData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setExpenses(expensesData);
+  useEffect(() => {
+    const user = FIREBASE_AUTH.currentUser;
+  if (!user) {
+    console.log('No authenticated user');
+    return;
+  }
+
+    // Fetch expenses
+    const expensesQuery = query(
+      collection(db, 'expenses'),
+      where('paidBy', '==', user.uid)
+    );
+
+    const unsubscribeExpenses = onSnapshot(expensesQuery, (snapshot) => {
+      const expensesData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })).slice(-3);
+      setExpenses(expensesData);
+    });
+
+    // fetch balances owed to and from other users
+    const balancesQuery = query(
+      collection(db, 'balances'), 
+      where('userId', '==', user.uid),
+      where('amount', '!=', 0));
+    const unsubscribeBalances = onSnapshot(balancesQuery, (snapshot) => {
+      const balancesData: Record<string, number> = {};
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        balancesData[data.friendName as string] = data.amount as number;
       });
-  
-      // fetch balances owed to and from other users
-      const balancesQuery = query(
-        collection(db, 'balances'), 
-        where('userId', '==', user.uid),
-        where('amount', '!=', 0));
-      const unsubscribeBalances = onSnapshot(balancesQuery, (snapshot) => {
-        const balancesData: Record<string, number> = {};
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          balancesData[data.friendName as string] = data.amount as number;
-        });
-        setBalances(balancesData);
-      });
-  
-      return () => {
-        unsubscribeExpenses();
-        unsubscribeBalances();
-      };
-    }, []);
+      setBalances(balancesData);
+    });
+
+    return () => {
+      unsubscribeExpenses();
+      unsubscribeBalances();
+    };
+  }, []);
 
   return (
     <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
