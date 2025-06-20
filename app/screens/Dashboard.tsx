@@ -111,15 +111,15 @@ const Dashboard = ({ navigation } : RouterProps) => {
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
                   <View style={styles.expenseItem}>
-                    <Text>{item.description}: ${item.amount} | </Text>
-                    <Text>Paid by: {item.paidByName}</Text>
+                    <Text style={styles.text}>{item.description}: ${item.amount} | </Text>
+                    <Text style={styles.text}>Paid by: {item.paidByName}</Text>
                   </View>
                 )}
               />
               
               <Text style={styles.subtitle2}>Balances:</Text>
               {Object.entries(balances).map(async ([friendId, amount]) => (
-                <Text key={friendId}>
+                <Text key={friendId} style={styles.text}>
                   {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount)}
                 </Text>
               ))}
@@ -144,7 +144,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
 
         <ActionButton
           imageSource={require('@/assets/assets/images/details.png')}
-          label="Details"
+          label="Balances"
           onPress={() => navigation.navigate('Details')}
         />
 
@@ -180,7 +180,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
 
 const styles = StyleSheet.create({
   infoCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.36)', // translucent card
+    backgroundColor: 'rgba(255, 255, 255, 0.36)', 
     paddingVertical: 30,
     paddingHorizontal: 26,
     marginHorizontal: 12,
@@ -191,7 +191,6 @@ const styles = StyleSheet.create({
   },
   gradient: {
     display: 'flex',
-
     flex: 1,
   },
   header: {
@@ -249,6 +248,10 @@ const styles = StyleSheet.create({
   wallet: {
     position: 'absolute',
     zIndex: -1,
+  },
+  text: {
+    color: '#00177d',
+    fontWeight: 'bold',
   },
 });
 

@@ -57,17 +57,6 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
     }
   };
 
-  // const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-  //   setShowDatePicker(false);
-  //   if(selectedDate) {
-  //     setDeadline(selectedDate);
-  //   }
-  // };
-
-  // const showPicker = () => {
-  //   setShowDatePicker(true);
-  // };
-
   return (
     <View style={styles.container}>
       <LinearGradient colors = {['rgb(157, 255, 252)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
@@ -92,21 +81,6 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         value={participants}
         onChangeText={setParticipants}
       />
-      {/* <TouchableOpacity style={styles.dateInput} onPress={showPicker}>
-        <Text style={styles.dateText}>
-          Deadline: {deadline.toLocaleDateString()}
-        </Text>
-      </TouchableOpacity>
-        
-        {showDatePicker && (
-          <DateTimePicker
-            value={deadline}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-            minimumDate={new Date()}
-          />
-        )} */}
       <DatePickerComponent/>
       <ActionButton
           imageSource={require('@/assets/assets/images/expenses.png')}
