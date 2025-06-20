@@ -14,6 +14,7 @@ import Transfer from './app/screens/Transfer';
 import SignupScreen from './app/screens/SignupScreen';
 import AddExpenseScreen from './app/screens/AddExpenseScreen';
 import FriendsScreen from './app/screens/FriendsScreen';
+import Details from './app/screens/Details';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,7 @@ function InsideLayout () {
       <InsideStack.Screen name="Transfer" component={Transfer} />
       <InsideStack.Screen name="Add Expense" component={AddExpenseScreen} />
       <InsideStack.Screen name="Friends" component={FriendsScreen} />
+      <InsideStack.Screen name="Details" component={Details} />
     </InsideStack.Navigator>
     </UserDataProvider>
     </DateProvider>
