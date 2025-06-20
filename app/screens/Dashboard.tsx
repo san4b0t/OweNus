@@ -1,7 +1,7 @@
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, ScrollView } from 'react-native';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from '../../FirebaseConfig';
@@ -126,6 +126,10 @@ const Dashboard = ({ navigation } : RouterProps) => {
       </View>
       
       <View style={styles.verticalButtons}>
+        <ScrollView
+          bounces={false}
+          overScrollMode="never"
+          contentContainerStyle={{ minHeight: '50%' }}>
         <ActionButton
           imageSource={require('@/assets/assets/images/transfer.png')}
           label="Transfer"
@@ -138,11 +142,11 @@ const Dashboard = ({ navigation } : RouterProps) => {
           onPress={() => navigation.navigate('Top Up')}
         />
 
-        {/* <ActionButton
+        <ActionButton
           imageSource={require('@/assets/assets/images/details.png')}
           label="Details"
-          onPress={() => navigation.navigate('details')}
-        /> */}
+          onPress={() => navigation.navigate('Details')}
+        />
 
         <ActionButton
           imageSource={require('@/assets/assets/images/friends.png')}
@@ -164,6 +168,8 @@ const Dashboard = ({ navigation } : RouterProps) => {
           onPress={() => FIREBASE_AUTH.signOut()}
           
         />
+        </ScrollView>
+        
         </View>
       <Image source={require('@/assets/assets/images/cash.png')} style={styles.cash}/>
     </LinearGradient>
@@ -206,6 +212,8 @@ const styles = StyleSheet.create({
   verticalButtons: {
     flexDirection: 'column',
     gap: 6,
+    flex: 1,
+    paddingBottom: 40,
   },
   cash: {
     position: 'absolute',
@@ -234,7 +242,7 @@ const styles = StyleSheet.create({
   expenseItem: {
     display: 'flex',
     flexDirection: 'row',
-    padding: 10,
+    padding: 4,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
