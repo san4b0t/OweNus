@@ -12,12 +12,10 @@ const DatePickerComponent = () => {
     setShowCalendar(false);
   };
 
-  // Format date for display and for react-native-calendars
   const formattedDate = deadline.toISOString().split('T')[0];
 
   return (
     <View>
-      {/* Custom styled date input */}
       <TouchableOpacity 
         style={styles.dateInput} 
         onPress={() => setShowCalendar(true)}
@@ -27,7 +25,6 @@ const DatePickerComponent = () => {
         </Text>
       </TouchableOpacity>
 
-      {/* Calendar Modal */}
       <Modal
         visible={showCalendar}
         transparent={true}

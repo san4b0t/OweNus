@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
   wrapper: {
     borderRadius: 16,
     marginHorizontal: 10,
+    marginVertical: 6,
   },
   actionButton: {
     backgroundColor: '#1E293B50',
@@ -36,6 +37,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     width: '100%',
+    gap: 5
   },
   actionButtonPressed: {
     borderColor: '#38BDF8',

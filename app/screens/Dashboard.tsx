@@ -1,9 +1,9 @@
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, ScrollView } from 'react-native';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
-import { collection, doc, getDoc, onSnapshot, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from '../../FirebaseConfig';
 import { IdContext } from '@/Global/IdContext';
 import { UserDataContext } from '@/Global/UserDataContext';
@@ -43,29 +43,39 @@ const Dashboard = ({ navigation } : RouterProps) => {
     if (globUser) {
       fetchSingleDocument('users', globUser);
     }
-  }, [globUser]);
+  }, []);
 
   const [expenses, setExpenses] = useState<{ id: string; [key: string]: any }[]>([]);
   const [balances, setBalances] = useState<Record<string, number>>({});
   
   useEffect(() => {
     const user = FIREBASE_AUTH.currentUser;
-  if (!user) {
-    console.log('No authenticated user');
-    return;
-  }
+    if (!user) {
+      console.log('No authenticated user');
+      return;
+    }
 
-    // Fetch expenses
+    // fetch user balance
+    const userDocRef = doc(db, 'users', globUser);
+    const unsubscribeUser = onSnapshot(userDocRef, (doc) => {
+    if (doc.exists()) {
+      setUserData(doc.data());
+    }
+  });
+
+
+    //fetch 3 most recent expenses
     const expensesQuery = query(
       collection(db, 'expenses'),
-      where('paidBy', '==', user.uid)
+      where('paidBy', '==', user.uid),
+      orderBy('createdAt', 'desc')
     );
 
     const unsubscribeExpenses = onSnapshot(expensesQuery, (snapshot) => {
       const expensesData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      })).slice(-3);
+      })).slice(0, 3);
       setExpenses(expensesData);
     });
 
@@ -86,6 +96,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
     return () => {
       unsubscribeExpenses();
       unsubscribeBalances();
+      unsubscribeUser();
     };
   }, []);
 
@@ -100,21 +111,25 @@ const Dashboard = ({ navigation } : RouterProps) => {
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
                   <View style={styles.expenseItem}>
-                    <Text>{item.description}: ${item.amount} | </Text>
-                    <Text>Paid by: {item.paidByName}</Text>
+                    <Text style={styles.text}>{item.description}: ${item.amount} | </Text>
+                    <Text style={styles.text}>Paid by: {item.paidByName}</Text>
                   </View>
                 )}
               />
               
               <Text style={styles.subtitle2}>Balances:</Text>
               {Object.entries(balances).map(async ([friendId, amount]) => (
-                <Text key={friendId}>
+                <Text key={friendId} style={styles.text}>
                   {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount)}
                 </Text>
               ))}
       </View>
       
       <View style={styles.verticalButtons}>
+        <ScrollView
+          bounces={false}
+          overScrollMode="never"
+          contentContainerStyle={{ minHeight: '50%' }}>
         <ActionButton
           imageSource={require('@/assets/assets/images/transfer.png')}
           label="Transfer"
@@ -126,11 +141,12 @@ const Dashboard = ({ navigation } : RouterProps) => {
           label="Top Up"
           onPress={() => navigation.navigate('Top Up')}
         />
-        {/* <ActionButton
+
+        <ActionButton
           imageSource={require('@/assets/assets/images/details.png')}
-          label="Details"
-          onPress={() => navigation.navigate('details')}
-        /> */}
+          label="Balances"
+          onPress={() => navigation.navigate('Details')}
+        />
 
         <ActionButton
           imageSource={require('@/assets/assets/images/friends.png')}
@@ -152,15 +168,19 @@ const Dashboard = ({ navigation } : RouterProps) => {
           onPress={() => FIREBASE_AUTH.signOut()}
           
         />
+        </ScrollView>
+        
         </View>
       <Image source={require('@/assets/assets/images/cash.png')} style={styles.cash}/>
     </LinearGradient>
+
+    
   );
 };
 
 const styles = StyleSheet.create({
   infoCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.36)', // translucent card
+    backgroundColor: 'rgba(255, 255, 255, 0.36)', 
     paddingVertical: 30,
     paddingHorizontal: 26,
     marginHorizontal: 12,
@@ -170,6 +190,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   gradient: {
+    display: 'flex',
     flex: 1,
   },
   header: {
@@ -190,6 +211,8 @@ const styles = StyleSheet.create({
   verticalButtons: {
     flexDirection: 'column',
     gap: 6,
+    flex: 1,
+    paddingBottom: 40,
   },
   cash: {
     position: 'absolute',
@@ -218,13 +241,17 @@ const styles = StyleSheet.create({
   expenseItem: {
     display: 'flex',
     flexDirection: 'row',
-    padding: 10,
+    padding: 4,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   wallet: {
     position: 'absolute',
     zIndex: -1,
+  },
+  text: {
+    color: '#00177d',
+    fontWeight: 'bold',
   },
 });
 

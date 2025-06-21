@@ -12,6 +12,7 @@ interface RouterProps {
 
 const FriendsScreen = ({ navigation }: RouterProps) => {
   const [friends, setFriends] = useState<string[]>([]);
+  const [friendEmails, setFriendEmails] = useState<string[]>([]);
   const [searchEmail, setSearchEmail] = useState('');
 
   useEffect(() => {
@@ -24,7 +25,7 @@ const FriendsScreen = ({ navigation }: RouterProps) => {
         where('userId', '==', user.uid)
       );
       const snapshot = await getDocs(friendsQuery);
-      setFriends(snapshot.docs.map(doc => doc.data().friendId));
+      setFriends(snapshot.docs.map(doc => doc.data().friendName));
     };
 
     fetchFriends();
@@ -34,6 +35,16 @@ const FriendsScreen = ({ navigation }: RouterProps) => {
     try {
       const user = FIREBASE_AUTH.currentUser;
       if (!user) return;
+
+      if (user.email == searchEmail) {
+        alert('Cannot add yourself as a friend');
+        return;
+      }
+
+      if (friendEmails.includes(searchEmail)) {
+        alert('Cannot add an existing friend');
+        return;
+      }
 
       // find user by email
       const usersQuery = query(
@@ -52,17 +63,22 @@ const FriendsScreen = ({ navigation }: RouterProps) => {
       // create friendship in both directions
       await addDoc(collection(db, 'friendships'), {
         userId: user.uid,
+        userName: user.displayName,
         friendId: friend.uid,
+        friendName: friend.name,
         createdAt: new Date()
       });
 
       await addDoc(collection(db, 'friendships'), {
         userId: friend.uid,
+        userName: friend.name,
         friendId: user.uid,
+        friendName: user.displayName,
         createdAt: new Date()
       });
 
-      setFriends([...friends, friend.uid]);
+      setFriends([...friends, friend.name]);
+      setFriendEmails([...friendEmails, searchEmail]);
       setSearchEmail('');
     } catch (error) {
       console.error('Error adding friend:', error);
@@ -88,17 +104,7 @@ const FriendsScreen = ({ navigation }: RouterProps) => {
           onPress={handleAddFriend}
           
         />
-      
-      {/* <FlatList
-        data={friends}
-        keyExtractor={item => item}
-        renderItem={({ item }) => (
-          <View style={styles.friendItem}>
-            <Text>{item}</Text>
-          </View>
-        )}
-      /> */}
-      
+      <Text style={styles.subtitle}>Your Friends</Text>
       <FlatList
       data={friends}
       keyExtractor={(item) => item}
@@ -107,6 +113,7 @@ const FriendsScreen = ({ navigation }: RouterProps) => {
         <Text style={styles.friends}>{item}</Text>
       </View>
       )}
+      style = {styles.listContainer}
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
           <Image
@@ -157,8 +164,8 @@ const styles = StyleSheet.create({
   friends: {
     textAlign: 'center',
     fontFamily: 'ZenDots',
-    color: '#ffb300',
-    fontSize: 14,
+    color: '#00177d',
+    fontSize: 20,
     fontWeight: '600',
     width: 'auto',
   },
@@ -190,6 +197,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Jersey25',
     color: '#ffb300',
     textAlign: 'center',
+  },
+  subtitle: {
+    fontFamily: 'ZenDots',
+    fontWeight: 'bold',
+    color: '#00177d',
+    fontSize: 22,
+    marginBottom: 10,
+    alignSelf: 'center',
+    marginTop: 20,
+  },
+  listContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.36)',
+    width: '95%',
+    alignSelf: 'center',
+    marginBottom: 20,
+    borderRadius: 20,
   },
 });
 
