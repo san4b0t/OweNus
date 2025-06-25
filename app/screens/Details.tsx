@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, StyleSheet } from 'react-native'
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable } from 'react-native'
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc } from "firebase/firestore";
 import { db, FIREBASE_AUTH } from '../../FirebaseConfig';
 
 const Details = () => {
@@ -49,7 +49,23 @@ const Details = () => {
             unsubscribeRelevantExpenses();
             unsubscribeRelevantReceivables();
         }
-    })
+    });
+
+    const markAsPaid = async (receivableId: string) => {
+      try {
+        if (!user) {
+          console.log('No authenticated user');
+          return;
+        }
+        const receivableRef = doc(db, 'indivExpenses', receivableId);
+        await updateDoc(receivableRef, { 
+          status: 'paid'
+        });
+        console.log('Status updated to paid');
+      } catch (error) {
+        console.error('Error updating status:', error);
+      }
+    };
 
   return (
     <View>
@@ -80,12 +96,12 @@ const Details = () => {
             data={receivables}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
-                <View style={styles.listContainer}>
+                <View style={styles.receivablesContainer}>
+                <View>
                 <View style={styles.inner}>
                     <Text style={styles.detailText}>{item.description} | Receivable from: {item.participant}</Text>
-                    <Text style={styles.detailText}> | Amount owed: ${item.amount}</Text>
                 </View>
-                <Text style={styles.detailText}>Deadline: {item.deadline ? 
+                <Text style={styles.detailText}>Amount Owed: {item.amount} | Deadline: {item.deadline ? 
                 item.deadline
                 .toDate()
                 .toLocaleDateString('en-US', {
@@ -93,6 +109,10 @@ const Details = () => {
                     day: 'numeric',
                     year: 'numeric',
                 }) : 'no deadline set'}</Text>
+                </View>
+                <Pressable onPress={() => markAsPaid(item.id)} style={styles.status}>
+                    <Text style={styles.statusText}>Settled</Text>
+                </Pressable>
                 </View>
             )}
         />
@@ -128,11 +148,31 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginVertical: 10,
       },
+      receivablesContainer: {
+        flexDirection: 'row',
+        gap: 20,
+        flex: 1,
+        alignItems: "center",
+        marginVertical: 10,
+        marginHorizontal: 10,
+        justifyContent: 'center',
+
+      },
       inner: {
         flexDirection: 'row',
       },
       detailText: {
         color: '#00177d',
         fontWeight: 'bold',
-      }
+      },
+      status: {
+        backgroundColor: 'green',
+        paddingVertical: 9,
+        paddingHorizontal: 14,
+        borderRadius: 5,
+      },
+      statusText: {
+        color: 'white',
+        fontWeight: 'bold',
+      },
 })
