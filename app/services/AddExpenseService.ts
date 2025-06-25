@@ -46,6 +46,7 @@ export const AddExpenseService = {
           paidBy: user.uid,
           paidByName: user.displayName,
           participant: participant.name,
+          participantId: participant.uid,
           createdAt: serverTimestamp(),
           date: formattedDate, 
           time: now.toLocaleTimeString(),
