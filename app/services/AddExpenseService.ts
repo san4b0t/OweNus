@@ -38,6 +38,24 @@ export const AddExpenseService = {
         if (name.trim() === user.displayName) return;
         
         const participant = await this.findUserByName(name.trim());
+
+        // add indiv expense object with deadline for each participant
+        await addDoc(collection(db, 'indivExpenses'), {
+          description,
+          amount: amountPerPerson,
+          paidBy: user.uid,
+          paidByName: user.displayName,
+          participant: participant.name,
+          participantId: participant.uid,
+          createdAt: serverTimestamp(),
+          date: formattedDate, 
+          time: now.toLocaleTimeString(),
+          deadline: deadlineTimestamp, 
+          status: 'pending'
+        });
+
+
+        // update balances owed to and from for each participant in the expense
         await this.updateBalanceRecords(
           user.uid,
           participant.uid,
