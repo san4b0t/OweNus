@@ -1,14 +1,17 @@
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, Button } from 'react-native';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from '../../FirebaseConfig';
 import { IdContext } from '@/Global/IdContext';
 import { UserDataContext } from '@/Global/UserDataContext';
 import ActionButton from '@/assets/components/ActionButton';
-
+import 'node-libs-react-native/globals';
+import 'react-native-url-polyfill/auto';
+import { MMSDK } from '../../web3/metamask';
+import * as Crypto from 'expo-crypto';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -20,6 +23,17 @@ const Dashboard = ({ navigation } : RouterProps) => {
   const { userData, setUserData } = useContext(UserDataContext);
   const user = FIREBASE_AUTH.currentUser;
   
+  const onPress = async () => {
+    const digest = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      'Github stars are neat'
+    );
+    console.log('Digest: ', digest);
+    await MMSDK.connect();
+    const ethereum  = MMSDK.getProvider();
+    const accounts = await ethereum?.request({ method: 'eth_requestAccounts'});
+    console.log(accounts);
+  }
 
   async function fetchSingleDocument(collectionId: string, documentId: string) {
     const docRef = doc(db, collectionId, documentId);
@@ -123,6 +137,12 @@ const Dashboard = ({ navigation } : RouterProps) => {
                   {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount)}
                 </Text>
               ))}
+      <View>
+        <Button
+          title="metamask"
+          onPress={onPress}
+        />
+      </View>
       </View>
       
       <View style={styles.verticalButtons}>
