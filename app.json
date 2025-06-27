@@ -4,7 +4,7 @@
     "slug": "OweNus",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/assets/images/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.san4bt.OweNus"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,6 +28,12 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fc2bb0de-3b62-4e7b-96b7-662bfa3bfa4d"
+      }
+    },
+    "owner": "san4bt"
   }
 }
