@@ -1,14 +1,15 @@
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, Pressable, LogBox } from 'react-native';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from '../../FirebaseConfig';
 import { IdContext } from '@/Global/IdContext';
 import { UserDataContext } from '@/Global/UserDataContext';
 import ActionButton from '@/assets/components/ActionButton';
-
+import { WalletConnectModal, useWalletConnectModal } from '@walletconnect/modal-react-native';
+import * as Updates from 'expo-updates';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -20,6 +21,49 @@ const Dashboard = ({ navigation } : RouterProps) => {
   const { userData, setUserData } = useContext(UserDataContext);
   const user = FIREBASE_AUTH.currentUser;
   
+  const projectId = '0848228c792dfdbd3539a2bce980524d';
+  const metadata = {
+    name: 'YOUR_PROJECT_NAME',
+    description: 'YOUR_PROJECT_DESCRIPTION',
+    url: 'https://your-project-website.com',
+    icons: ['https://your-project-logo.com'],
+    redirect: {
+      native: 'YOUR_APP_SCHEME://',
+      universal: 'YOUR_APP_UNIVERSAL_LINK.com',
+    }
+  }
+
+  const { open, isConnected, address, provider } = useWalletConnectModal();
+  const connect = async () => {
+
+    console.log('working...')
+
+    if (isConnected) {
+      return provider?.disconnect();
+    }
+
+    open();
+  }
+
+  const reloadApp = async () => {
+    try {
+      await Updates.reloadAsync();
+    } catch (error) {
+      console.error("Failed to reload app:", error);
+    }
+  };
+
+  const [reload, setReload] = useState<Boolean>(false);
+  useEffect(() => {
+    console.log('address change detected')
+    if (reload) {
+      reloadApp();
+    }
+  }, [address])
+
+LogBox.ignoreLogs([
+  'react-native-compat: Application module is not available',
+]);
 
   async function fetchSingleDocument(collectionId: string, documentId: string) {
     const docRef = doc(db, collectionId, documentId);
@@ -123,6 +167,18 @@ const Dashboard = ({ navigation } : RouterProps) => {
                   {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount)}
                 </Text>
               ))}
+      <Text>WallectConnect</Text>
+      <Text>{ isConnected ? address : 'no wallet connected' }</Text>
+      <Pressable onPress={connect}>
+        <Text>{ isConnected ? 'disconnect' : 'connect' }</Text>
+      </Pressable>
+      <WalletConnectModal
+        explorerRecommendedWalletIds={[
+          '0x9399b54B05D0b8711Eb2a5839770a5E87a6345b5',
+        ]}
+        projectId={projectId}
+        providerMetadata={metadata}
+      />
       </View>
       
       <View style={styles.verticalButtons}>
@@ -173,8 +229,6 @@ const Dashboard = ({ navigation } : RouterProps) => {
         </View>
       <Image source={require('@/assets/assets/images/cash.png')} style={styles.cash}/>
     </LinearGradient>
-
-    
   );
 };
 
