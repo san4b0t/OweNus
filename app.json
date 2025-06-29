@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.san4bt.OweNus"
     },
     "web": {
       "favicon": "./assets/assets/images/favicon.png"

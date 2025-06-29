@@ -4,7 +4,7 @@ import Login from './app/screens/Login';
 import Dashboard from './app/screens/Dashboard';
 import TopUpScreen from './app/screens/TopUp';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FIREBASE_AUTH } from './FirebaseConfig';
 import {IdProvider, IdContext} from './Global/IdContext';
 import {UserDataProvider, UserDataContext} from './Global/UserDataContext';
@@ -34,7 +34,7 @@ function InsideLayout () {
     </InsideStack.Navigator>
     </UserDataProvider>
     </DateProvider>
-    
+  
   )
 }
 
