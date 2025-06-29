@@ -188,6 +188,12 @@ LogBox.ignoreLogs([
           contentContainerStyle={{ minHeight: '50%' }}>
         <ActionButton
           imageSource={require('@/assets/assets/images/transfer.png')}
+          label="Insights"
+          onPress={() => navigation.navigate('Insights')}
+          
+        />
+        <ActionButton
+          imageSource={require('@/assets/assets/images/transfer.png')}
           label="Transfer"
           onPress={() => navigation.navigate('Transfer')}
           
