@@ -4,7 +4,7 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
 const MODEL_URL =
-  'https://chellu19.github.io/expense-model/model.json'; // ← Replace with your GitHub Pages URL
+  'https://expensemodel-m6aug6g31-chellu19s-projects.vercel.app/model.json';
 
 const InsightsScreen = () => {
   const [isReady, setIsReady] = useState(false);

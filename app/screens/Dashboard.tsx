@@ -186,12 +186,7 @@ LogBox.ignoreLogs([
           bounces={false}
           overScrollMode="never"
           contentContainerStyle={{ minHeight: '50%' }}>
-        <ActionButton
-          imageSource={require('@/assets/assets/images/transfer.png')}
-          label="Insights"
-          onPress={() => navigation.navigate('Insights')}
-          
-        />
+        
         <ActionButton
           imageSource={require('@/assets/assets/images/transfer.png')}
           label="Transfer"
@@ -221,6 +216,12 @@ LogBox.ignoreLogs([
           imageSource={require('@/assets/assets/images/expenses.png')}
           label="Add Expense"
           onPress={() => navigation.navigate('Add Expense')}  
+        />
+
+        <ActionButton
+          imageSource={require('@/assets/assets/images/insights.png')}
+          label="Insights"
+          onPress={() => navigation.navigate('Insights')}
           
         />
 
