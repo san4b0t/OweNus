@@ -167,10 +167,18 @@ LogBox.ignoreLogs([
                   {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount)}
                 </Text>
               ))}
-      <Text>WallectConnect</Text>
-      <Text>{ isConnected ? address : 'no wallet connected' }</Text>
-      <Pressable onPress={connect}>
-        <Text>{ isConnected ? 'disconnect' : 'connect' }</Text>
+      </View>
+      
+      <View style={styles.verticalButtons}>
+        <ScrollView
+          bounces={false}
+          overScrollMode="never"
+          contentContainerStyle={{ minHeight: '50%' }}>
+      <View style={styles.walletConnect}>
+      <Text style={styles.text}>WallectConnect</Text>
+      <Text style={styles.text}>{ isConnected ? address : 'no wallet connected' }</Text>
+      <Pressable onPress={connect} style={styles.connectButton}>
+        <Text style={styles.buttonText}>{ isConnected ? 'disconnect' : 'connect' }</Text>
       </Pressable>
       <WalletConnectModal
         explorerRecommendedWalletIds={[
@@ -180,13 +188,12 @@ LogBox.ignoreLogs([
         providerMetadata={metadata}
       />
       </View>
-      
-      <View style={styles.verticalButtons}>
-        <ScrollView
-          bounces={false}
-          overScrollMode="never"
-          contentContainerStyle={{ minHeight: '50%' }}>
-        
+        <ActionButton
+          imageSource={require('@/assets/assets/images/insights.png')}
+          label="Insights"
+          onPress={() => navigation.navigate('Insights')}
+          
+        />
         <ActionButton
           imageSource={require('@/assets/assets/images/transfer.png')}
           label="Transfer"
@@ -314,6 +321,28 @@ const styles = StyleSheet.create({
     color: '#00177d',
     fontWeight: 'bold',
   },
+  walletConnect: {
+    backgroundColor: 'rgba(255, 255, 255, 0.36)', 
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    marginHorizontal: 12,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 10,
+    gap: 2,
+  },
+  connectButton: {
+    backgroundColor: '#00177d',
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 5,
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  }
 });
 
 export default Dashboard;

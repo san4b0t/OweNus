@@ -1,12 +1,13 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Alert, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, TextInput, Alert, StyleSheet, Image, Switch, FlatList } from 'react-native';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionButton from '@/assets/components/ActionButton';
 import { AddExpenseService } from '../services/AddExpenseService';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import DatePickerComponent from '@/assets/components/DatePickerComponent';
 import { DateContext } from '@/Global/DateContext';
+import { FIREBASE_AUTH, db } from '../../FirebaseConfig';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -20,6 +21,26 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
   const [participants, setParticipants] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [friends, setFriends] = useState<string[]>([]);
+  const [custom, setCustom] = useState(false);
+  const [splits, setSplits] = useState('');
+
+  //friends
+  const fetchFriends = async () => {
+    const user = FIREBASE_AUTH.currentUser;
+    if (!user) return;
+
+    const friendsQuery = query(
+      collection(db, 'friendships'),
+      where('userId', '==', user.uid)
+    );
+    const snapshot = await getDocs(friendsQuery);
+    setFriends(snapshot.docs.map(doc => doc.data().friendName));
+  };
+
+  useEffect(() => {
+    fetchFriends();
+  }, []);
 
   const handleAddExpense = async () => {
     // input validation
@@ -45,9 +66,15 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
       return;
     }
 
+    const splitsProcessed = splits.split(',').map(s => s.trim()).filter(s => s != '').map(s => parseFloat(s)); 
+
     setIsProcessing(true);
     try {
-      await AddExpenseService.createExpense(description, amountNumber, participantNames,deadline);
+      if (custom) {
+        await AddExpenseService.createCustomExpense(description, amountNumber, participantNames, splitsProcessed, deadline);
+      } else {
+        await AddExpenseService.createExpense(description, amountNumber, participantNames, deadline);
+      }
       navigation.goBack();
     } catch (error: any) {
       Alert.alert('Error', error.message);
@@ -60,8 +87,15 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
   return (
     <View style={styles.container}>
       <LinearGradient colors = {['rgb(157, 255, 252)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
-      <Image source={require('@/assets/assets/images/money-cash.gif')} style={styles.expense}/>
+      {/* <Image source={require('@/assets/assets/images/money-cash.gif')} style={styles.expense}/> */}
       <Text style={styles.title}>Add New Expense</Text>
+      <View style={styles.toggle}>
+      <Text style={styles.toggleText}>Expense type: {custom ? 'Custom' : 'Equal'}</Text>
+      <Switch
+        onValueChange={() => setCustom(previousState => !previousState)}
+        value={custom}
+      />
+    </View>
       <TextInput
         style={styles.input}
         placeholder="Description"
@@ -81,12 +115,40 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         value={participants}
         onChangeText={setParticipants}
       />
+      {custom ?
+        <TextInput 
+        style={styles.input}
+        placeholder="Splits (comma separated, in order of names listed)"
+        value={splits}
+        onChangeText={setSplits}
+        /> : <View></View>
+      }
       <DatePickerComponent/>
       <ActionButton
           imageSource={require('@/assets/assets/images/expenses.png')}
           label="Add Expense"
           onPress={handleAddExpense}
           
+        />
+      <Text style={styles.subtitle}>Your Friends</Text>
+      <FlatList
+        data={friends}
+        keyExtractor={(item) => item}
+        renderItem={({ item }) => (
+        <View style={styles.friendItem}>
+          <Text style={styles.friends}>{item}</Text>
+        </View>
+        )}
+        style = {styles.listContainer}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Image
+              source={require('@/assets/assets/images/nofriends.png')} // 
+              style={styles.emptyImage}
+            />
+          <Text style={styles.emptyText}>"you tried to console.log(myFriends) but it returned an empty array... guess you need to fetch some new ones!"</Text>
+          </View>
+        }
         />
       </LinearGradient>
     </View>
@@ -104,7 +166,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    marginTop: 220,
+    marginTop: 20,
     marginBottom: 20,
     color: '#00177d',
     fontFamily: 'ZenDots',
@@ -115,7 +177,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 20,
+    marginBottom: 10,
     paddingHorizontal: 10,
     textAlign: 'center',
     backgroundColor: 'white',
@@ -142,6 +204,64 @@ const styles = StyleSheet.create({
   dateText: {
     color: '#00177d',
     fontWeight: 'bold',
+  },
+  friendItem: { 
+    padding: 10, 
+    borderBottomWidth: 1, 
+    borderBottomColor: 'transparent' ,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyImage: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+    marginBottom: 20,
+  },
+  emptyText: {
+    fontSize: 22,
+    fontFamily: 'Jersey25',
+    color: '#ffb300',
+    textAlign: 'center',
+  },
+  listContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.36)',
+    width: '95%',
+    alignSelf: 'center',
+    marginBottom: 20,
+    borderRadius: 20,
+  },
+  friends: {
+    textAlign: 'center',
+    fontFamily: 'ZenDots',
+    color: '#00177d',
+    fontSize: 20,
+    fontWeight: '600',
+    width: 'auto',
+  },
+  subtitle: {
+    fontFamily: 'ZenDots',
+    fontWeight: 'bold',
+    color: '#00177d',
+    fontSize: 22,
+    marginBottom: 10,
+    alignSelf: 'center',
+    marginTop: 20,
+  },
+  toggle: {
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 5,
+  },
+  toggleText: {
+    fontSize: 22,
+    fontFamily: 'Jersey25',
+    color: '#00177d',
+    textAlign: 'center',
   },
 });
 

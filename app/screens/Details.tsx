@@ -101,7 +101,7 @@ const Details = () => {
                 <View style={styles.inner}>
                     <Text style={styles.detailText}>{item.description} | Receivable from: {item.participant}</Text>
                 </View>
-                <Text style={styles.detailText}>Amount Owed: {item.amount} | Deadline: {item.deadline ? 
+                <Text style={styles.detailText}>Amount Owed: ${item.amount} | Deadline: {item.deadline ? 
                 item.deadline
                 .toDate()
                 .toLocaleDateString('en-US', {
