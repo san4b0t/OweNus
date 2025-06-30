@@ -370,7 +370,7 @@ The initial milestone of the OweNUS project focused on establishing the foundati
 | **Sign In/ Sign Up Screen**             | Implemented Sign In and Sign Up feature                                                                                                                                                                             |
 | **Dashboard Screen**                    | Implemented Dashboard                                                                                                                                                                                               |
 | **Transfers, Topups, Expenses Screens** | Implemented Transfers, TopUps, Expenses Screens                                                                                                                                                                     |
-| **PostgreSQL database setup**           | Implemented Profiles, Communities, Posts, Comment tables                                                                                                                                                            |
+| **Firebase database setup**             | Implemented Firestore database, Authentication, Indexes, Collections and documents in firestore                                                                                                                     |
 
 #### **9.1.1 GitHub Repository Setup**
 
