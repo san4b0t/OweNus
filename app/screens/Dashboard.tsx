@@ -164,7 +164,7 @@ LogBox.ignoreLogs([
               <Text style={styles.subtitle2}>Balances:</Text>
               {Object.entries(balances).map(async ([friendId, amount]) => (
                 <Text key={friendId} style={styles.text}>
-                  {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount)}
+                  {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount).toFixed(2)}
                 </Text>
               ))}
       </View>
@@ -223,13 +223,6 @@ LogBox.ignoreLogs([
           imageSource={require('@/assets/assets/images/expenses.png')}
           label="Add Expense"
           onPress={() => navigation.navigate('Add Expense')}  
-        />
-
-        <ActionButton
-          imageSource={require('@/assets/assets/images/insights.png')}
-          label="Insights"
-          onPress={() => navigation.navigate('Insights')}
-          
         />
 
         <ActionButton
