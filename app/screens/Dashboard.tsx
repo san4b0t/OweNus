@@ -223,6 +223,12 @@ LogBox.ignoreLogs([
           imageSource={require('@/assets/assets/images/expenses.png')}
           label="Add Expense"
           onPress={() => navigation.navigate('Add Expense')}  
+        />
+
+        <ActionButton
+          imageSource={require('@/assets/assets/images/insights.png')}
+          label="Insights"
+          onPress={() => navigation.navigate('Insights')}
           
         />
 
