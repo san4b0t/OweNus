@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable } from 'react-native'
+import React, { useState, useEffect } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc } from "firebase/firestore";
 import { db, FIREBASE_AUTH } from '../../FirebaseConfig';
 
@@ -68,6 +69,7 @@ const Details = () => {
     };
 
   return (
+     <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
     <View>
         <Text style={styles.title}>Balances</Text>
         <Text style={styles.subtitle}>Pending Balances You Owe:</Text>
@@ -117,12 +119,17 @@ const Details = () => {
             )}
         />
     </View>
+    </LinearGradient>
   )
 }
 
 export default Details;
 
 const styles = StyleSheet.create({
+  gradient: {
+    display: 'flex',
+    flex: 1,
+  },
     title: {
         fontFamily: 'ZenDots',
         fontWeight: 'bold',
