@@ -1,13 +1,14 @@
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, ScrollView, Pressable, LogBox } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, LogBox, Pressable, Animated } from 'react-native';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from '../../FirebaseConfig';
 import { IdContext } from '@/Global/IdContext';
 import { UserDataContext } from '@/Global/UserDataContext';
 import ActionButton from '@/assets/components/ActionButton';
+import AnimatedButton from '@/assets/components/AnimatedButton';
 import { WalletConnectModal, useWalletConnectModal } from '@walletconnect/modal-react-native';
 import * as Updates from 'expo-updates';
 
@@ -175,11 +176,20 @@ LogBox.ignoreLogs([
           overScrollMode="never"
           contentContainerStyle={{ minHeight: '50%' }}>
       <View style={styles.walletConnect}>
-      <Text style={styles.text}>WallectConnect</Text>
-      <Text style={styles.text}>{ isConnected ? address : 'no wallet connected' }</Text>
-      <Pressable onPress={connect} style={styles.connectButton}>
-        <Text style={styles.buttonText}>{ isConnected ? 'disconnect' : 'connect' }</Text>
-      </Pressable>
+      
+      <Text style={styles.text}>{ isConnected ? address : 'No MetaMask wallet connected' }</Text>
+      <AnimatedButton onPress={connect} style={styles.connectButton}>
+        <View style={styles.buttonContent}>
+          <Image
+            source={require('@/assets/assets/images/MetaMask.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.buttonText}>
+            {isConnected ? 'Disconnect' : 'Connect'}
+          </Text>
+        </View>
+      </AnimatedButton>
       <WalletConnectModal
         explorerRecommendedWalletIds={[
           '0x9399b54B05D0b8711Eb2a5839770a5E87a6345b5',
@@ -313,6 +323,7 @@ const styles = StyleSheet.create({
   text: {
     color: '#00177d',
     fontWeight: 'bold',
+    fontFamily: 'Orbitron',
   },
   walletConnect: {
     backgroundColor: 'rgba(255, 255, 255, 0.36)', 
@@ -333,9 +344,20 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   buttonText: {
-    color: 'white',
+    color: 'yellow',
     fontWeight: 'bold',
-  }
+    fontFamily: 'Orbitron',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 20,
+    height: 20,
+    marginRight: 8,
+  },
 });
 
-export default Dashboard;
+export default Dashboard; 
