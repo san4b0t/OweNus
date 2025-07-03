@@ -30,6 +30,7 @@
     "expo-status-bar": "~2.2.3",
     "expo-updates": "~0.28.15",
     "firebase": "^11.8.1",
+    "moti": "^0.30.0",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-calendars": "^1.1312.1",

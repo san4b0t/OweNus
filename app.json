@@ -4,11 +4,11 @@
     "slug": "OweNus",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/assets/images/icon.png",
+    "icon": "./assets/assets/images/owenus.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/assets/images/splash-icon.png",
+      "image": "./assets/assets/images/owenus.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/assets/images/owenus.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
