@@ -11,6 +11,8 @@ import ActionButton from '@/assets/components/ActionButton';
 import AnimatedButton from '@/assets/components/AnimatedButton';
 import { WalletConnectModal, useWalletConnectModal } from '@walletconnect/modal-react-native';
 import * as Updates from 'expo-updates';
+import {numberToHex, sanitizeHex, utf8ToHex} from '@walletconnect/encoding';
+import { ethers } from 'ethers';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -65,6 +67,36 @@ const Dashboard = ({ navigation } : RouterProps) => {
 LogBox.ignoreLogs([
   'react-native-compat: Application module is not available',
 ]);
+
+const onSendTransaction = async () => {
+  if (!provider) {
+    return;
+  }
+
+  const chainId = await provider.request({
+    method: 'eth_chainId',
+  });
+  const amount = "0x1111d67bb1bb0000";
+  console.log(amount);
+
+  const transaction = {
+    from: address,
+    to: '0x9399b54B05D0b8711Eb2a5839770a5E87a6345b5', // test address
+    value: amount,
+    chainId,
+    data: '0x',
+  };
+
+  const txResponse = await provider.request({
+    method: 'eth_sendTransaction',
+    params: [transaction],
+  });
+
+  return {
+    method: 'send transaction',
+    result: txResponse,
+  };
+};
 
   async function fetchSingleDocument(collectionId: string, documentId: string) {
     const docRef = doc(db, collectionId, documentId);
@@ -187,6 +219,18 @@ LogBox.ignoreLogs([
           />
           <Text style={styles.buttonText}>
             {isConnected ? 'Disconnect' : 'Connect'}
+          </Text>
+        </View>
+      </AnimatedButton>
+      <AnimatedButton onPress={onSendTransaction} style={styles.connectButton}>
+        <View style={styles.buttonContent}>
+          <Image
+            source={require('@/assets/assets/images/MetaMask.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.buttonText}>
+            send
           </Text>
         </View>
       </AnimatedButton>
