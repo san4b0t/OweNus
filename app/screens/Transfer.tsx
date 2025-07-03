@@ -6,6 +6,7 @@ import React, { useState } from 'react'
 import { View, Text, TextInput, StyleSheet, Alert, Image } from 'react-native';
 import ActionButton from '@/assets/components/ActionButton';
 import { TransferService } from '../services/TransferService';
+import { WalletConnectModal, useWalletConnectModal } from '@walletconnect/modal-react-native';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -15,6 +16,37 @@ const Transfer = ({ navigation }: RouterProps) => {
 
   const [friendName, setFriendName] = useState('');
   const [amount, setAmount] = useState('');
+  const { open, isConnected, address, provider } = useWalletConnectModal();
+
+  const onSendTransaction = async () => {
+    if (!provider) {
+      return;
+    }
+  
+    const chainId = await provider.request({
+      method: 'eth_chainId',
+    });
+    const hexAmt = '0x' + (parseFloat(amount) * 1000000000000000000).toString(16);
+    console.log(hexAmt);
+  
+    const transaction = {
+      from: address,
+      to: '0x9399b54B05D0b8711Eb2a5839770a5E87a6345b5', // test address
+      value: hexAmt,
+      chainId,
+      data: '0x',
+    };
+  
+    const txResponse = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [transaction],
+    });
+  
+    return {
+      method: 'send transaction',
+      result: txResponse,
+    };
+  };
 
   const handleTransfer = async () => {
     if (!friendName || !amount) {
@@ -67,6 +99,8 @@ const Transfer = ({ navigation }: RouterProps) => {
           -amountNumber
         )
       ]);
+
+      onSendTransaction();
 
       Alert.alert(
         'Success', 
