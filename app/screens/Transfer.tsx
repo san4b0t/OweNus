@@ -18,7 +18,7 @@ const Transfer = ({ navigation }: RouterProps) => {
   const [amount, setAmount] = useState('');
   const { open, isConnected, address, provider } = useWalletConnectModal();
 
-  const onSendTransaction = async () => {
+  const onSendTransaction = async (wid: string) => {
     if (!provider) {
       return;
     }
@@ -31,7 +31,7 @@ const Transfer = ({ navigation }: RouterProps) => {
   
     const transaction = {
       from: address,
-      to: '0x9399b54B05D0b8711Eb2a5839770a5E87a6345b5', // test address
+      to: wid,
       value: hexAmt,
       chainId,
       data: '0x',
@@ -99,8 +99,8 @@ const Transfer = ({ navigation }: RouterProps) => {
           -amountNumber
         )
       ]);
-
-      onSendTransaction();
+      console.log(friendData.walletId)
+      onSendTransaction(friendData.walletId);
 
       Alert.alert(
         'Success', 

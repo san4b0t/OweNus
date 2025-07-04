@@ -3,7 +3,7 @@ import { setDoc, doc } from 'firebase/firestore';
 import { FIREBASE_AUTH, db } from '../../FirebaseConfig';
 
 export const Auth = {
-  async signUp(email: string, password: string, name: string) {
+  async signUp(email: string, password: string, name: string, walletId: string) {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         FIREBASE_AUTH,
@@ -21,6 +21,7 @@ export const Auth = {
         email,
         balance: 0,
         createdAt: new Date(),
+        walletId: walletId,
       });
 
       return userCredential.user;
