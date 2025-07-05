@@ -35,7 +35,11 @@ export const AddExpenseService = {
     const amountPerPerson = amount / participantNames.length;
     await Promise.all(
       participantNames.map(async (name) => {
+<<<<<<< HEAD
         
+=======
+        if (name === user.displayName) return;
+>>>>>>> d0ac0c7e40e7e85af1542f61636785594387843f
         const participant = await this.findUserByName(name.trim());
 
         // add indiv expense object with deadline for each participant
