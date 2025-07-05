@@ -146,113 +146,119 @@ LogBox.ignoreLogs([
   }, []);
 
   return (
-    <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
+    <LinearGradient
+      colors={[
+        'rgba(153, 255, 252, 1)',
+        'rgba(61,150,185,1)',
+        'rgba(61,150,185,1)',
+        'rgba(15,0,87,1)',
+      ]}
+      style={styles.gradient}>
       <View style={styles.infoCard}>
         <Text style={styles.header}>Welcome, {user?.displayName || 'User'}</Text>
-        <Text style={styles.balance}> Balance:${userData?.balance||0}</Text>
+        <Text style={styles.balance}>Balance: ${userData?.balance || 0}</Text>
         <Text style={styles.subtitle1}>Recent Expenses:</Text>
-              <FlatList
-                data={expenses}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => (
-                  <View style={styles.expenseItem}>
-                    <Text style={styles.text}>{item.description}: ${item.amount} | </Text>
-                    <Text style={styles.text}>Paid by: {item.paidByName}</Text>
-                  </View>
-                )}
-              />
-              
-              <Text style={styles.subtitle2}>Balances:</Text>
-              {Object.entries(balances).map(async ([friendId, amount]) => (
-                <Text key={friendId} style={styles.text}>
-                  {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} ${Math.abs(amount).toFixed(2)}
-                </Text>
-              ))}
-      </View>
-      
-      <View style={styles.verticalButtons}>
-        <ScrollView
-          bounces={false}
-          overScrollMode="never"
-          contentContainerStyle={{ minHeight: '50%' }}>
-      <View style={styles.walletConnect}>
-      
-      <Text style={styles.text}>{ isConnected ? address : 'No MetaMask wallet connected' }</Text>
-      <AnimatedButton onPress={connect} style={styles.connectButton}>
-        <View style={styles.buttonContent}>
-          <Image
-            source={require('@/assets/assets/images/MetaMask.png')} 
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.buttonText}>
-            {isConnected ? 'Disconnect' : 'Connect'}
+        <FlatList
+          data={expenses}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.expenseItem}>
+              <Text style={styles.text}>
+                {item.description}: ${item.amount} |{' '}
+              </Text>
+              <Text style={styles.text}>Paid by: {item.paidByName}</Text>
+            </View>
+          )}
+        />
+
+        <Text style={styles.subtitle2}>Balances:</Text>
+        {Object.entries(balances).map(([friendId, amount]) => (
+          <Text key={friendId} style={styles.text}>
+            {friendId}: {amount < 0 ? 'You owe' : 'Owes you'} $
+            {Math.abs(amount).toFixed(2)}
           </Text>
-        </View>
-      </AnimatedButton>
-      <WalletConnectModal
-        explorerRecommendedWalletIds={[
-          '0x9399b54B05D0b8711Eb2a5839770a5E87a6345b5',
-        ]}
-        projectId={projectId}
-        providerMetadata={metadata}
-      />
+        ))}
       </View>
-      
+
+      <View style={styles.walletConnect}>
+        <Text style={styles.text}>
+          {isConnected ? address : 'No MetaMask wallet connected'}
+        </Text>
+        <AnimatedButton onPress={connect} style={styles.connectButton}>
+          <View style={styles.buttonContent}>
+            <Image
+              source={require('@/assets/assets/images/MetaMask.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.buttonText}>
+              {isConnected ? 'Disconnect' : 'Connect'}
+            </Text>
+          </View>
+        </AnimatedButton>
+        <WalletConnectModal
+          explorerRecommendedWalletIds={[
+            '0x9399b54B05D0b8711Eb2a5839770a5E87a6345b5',
+          ]}
+          projectId={projectId}
+          providerMetadata={metadata}
+        />
+      </View>
+
       <View style={styles.verticalButtons}>
         <ScrollView
           bounces={false}
           overScrollMode="never"
           contentContainerStyle={{ minHeight: '50%' }}>
-        
-        <ActionButton
-          imageSource={require('@/assets/assets/images/transfer.png')}
-          label="Transfer"
-          onPress={() => navigation.navigate('Transfer')}
-          
-        />
-        <ActionButton
-          imageSource={require('@/assets/assets/images/topup.png')}
-          label="Top Up"
-          onPress={() => navigation.navigate('Top Up')}
-        />
-
-        <ActionButton
-          imageSource={require('@/assets/assets/images/details.png')}
-          label="Balances"
-          onPress={() => navigation.navigate('Details')}
-        />
-
-        <ActionButton
-          imageSource={require('@/assets/assets/images/friends.png')}
-          label="Friends"
-          onPress={() => navigation.navigate('Friends')}
-        />
-        
-
-        <ActionButton
-          imageSource={require('@/assets/assets/images/expenses.png')}
-          label="Add Expense"
-          onPress={() => navigation.navigate('Add Expense')}  
-        />
-
-        <ActionButton
-          imageSource={require('@/assets/assets/images/logout.png')}
-          label="Logout"
-          onPress={() => FIREBASE_AUTH.signOut()}
-          
-        />
+          <ActionButton
+            imageSource={require('@/assets/assets/images/transfer.png')}
+            label="Transfer"
+            onPress={() => navigation.navigate('Transfer')}
+          />
+          <ActionButton
+            imageSource={require('@/assets/assets/images/topup.png')}
+            label="Top Up"
+            onPress={() => navigation.navigate('Top Up')}
+          />
+          <ActionButton
+            imageSource={require('@/assets/assets/images/details.png')}
+            label="Balances"
+            onPress={() => navigation.navigate('Details')}
+          />
+          <ActionButton
+            imageSource={require('@/assets/assets/images/friends.png')}
+            label="Friends"
+            onPress={() => navigation.navigate('Friends')}
+          />
+          <ActionButton
+            imageSource={require('@/assets/assets/images/expenses.png')}
+            label="Add Expense"
+            onPress={() => navigation.navigate('Add Expense')}
+          />
+          <ActionButton
+            imageSource={require('@/assets/assets/images/insights.png')}
+            label="Insights"
+            onPress={() => navigation.navigate('Insights')}
+          />
+          <ActionButton
+            imageSource={require('@/assets/assets/images/logout.png')}
+            label="Logout"
+            onPress={() => FIREBASE_AUTH.signOut()}
+          />
         </ScrollView>
-        
-        </View>
-      <Image source={require('@/assets/assets/images/cash.png')} style={styles.cash}/>
+      </View>
+
+      <Image
+        source={require('@/assets/assets/images/cash.png')}
+        style={styles.cash}
+      />
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   infoCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.36)', 
+    backgroundColor: 'rgba(255, 255, 255, 0.36)',
     paddingVertical: 30,
     paddingHorizontal: 26,
     marginHorizontal: 12,
@@ -274,7 +280,7 @@ const styles = StyleSheet.create({
     marginBottom: 'auto',
   },
   balance: {
-    fontFamily:'Orbitron' ,
+    fontFamily: 'Orbitron',
     fontSize: 24,
     color: '#001561',
     textAlign: 'center',
@@ -292,22 +298,22 @@ const styles = StyleSheet.create({
     height: 300,
     left: -140,
     bottom: -120,
-    zIndex: -1, 
+    zIndex: -1,
   },
   subtitle1: {
-    fontFamily: 'orbitron',
+    fontFamily: 'Orbitron',
     fontSize: 20,
     marginTop: 20,
     marginBottom: 10,
-    fontWeight: 'semibold',
+    fontWeight: '600',
     color: '#001561',
   },
   subtitle2: {
-    fontFamily: 'orbitron',
+    fontFamily: 'Orbitron',
     fontSize: 20,
     marginTop: 5,
     marginBottom: 10,
-    fontWeight: 'semibold',
+    fontWeight: '600',
     color: '#001561',
   },
   expenseItem: {
@@ -317,17 +323,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
-  wallet: {
-    position: 'absolute',
-    zIndex: -1,
-  },
   text: {
     color: '#00177d',
     fontWeight: 'bold',
     fontFamily: 'Orbitron',
   },
   walletConnect: {
-    backgroundColor: 'rgba(255, 255, 255, 0.36)', 
+    backgroundColor: 'rgba(255, 255, 255, 0.36)',
     paddingVertical: 10,
     paddingHorizontal: 6,
     marginHorizontal: 12,
@@ -361,4 +363,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dashboard; 
+export default Dashboard;
