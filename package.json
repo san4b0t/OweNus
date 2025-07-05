@@ -45,12 +45,8 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
-<<<<<<< HEAD
     "typescript": "~5.8.3",
     "@react-native-community/cli": "latest"
-=======
-    "typescript": "~5.8.3"
->>>>>>> d0ac0c7e40e7e85af1542f61636785594387843f
   },
   "private": true
 }

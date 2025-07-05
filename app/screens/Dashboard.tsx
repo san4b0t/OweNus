@@ -198,7 +198,6 @@ LogBox.ignoreLogs([
         providerMetadata={metadata}
       />
       </View>
-<<<<<<< HEAD
       
       <View style={styles.verticalButtons}>
         <ScrollView
@@ -206,14 +205,6 @@ LogBox.ignoreLogs([
           overScrollMode="never"
           contentContainerStyle={{ minHeight: '50%' }}>
         
-=======
-        <ActionButton
-          imageSource={require('@/assets/assets/images/insights.png')}
-          label="Insights"
-          onPress={() => navigation.navigate('Insights')}
-          
-        />
->>>>>>> d0ac0c7e40e7e85af1542f61636785594387843f
         <ActionButton
           imageSource={require('@/assets/assets/images/transfer.png')}
           label="Transfer"
