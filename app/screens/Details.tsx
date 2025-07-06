@@ -69,13 +69,16 @@ const Details = () => {
     };
 
   return (
-     <LinearGradient colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
+     <LinearGradient 
+     colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} 
+     style={styles.gradient}>
     <View>
         <Text style={styles.title}>Balances</Text>
         <Text style={styles.subtitle}>Pending Balances You Owe:</Text>
         <FlatList
             data={expenses}
             keyExtractor={item => item.id}
+            scrollEnabled={false}
             renderItem={({ item }) => (
                 <View style={styles.listContainer}>
                 <View style={styles.inner}>
@@ -97,6 +100,7 @@ const Details = () => {
         <FlatList
             data={receivables}
             keyExtractor={item => item.id}
+            scrollEnabled={false}
             renderItem={({ item }) => (
                 <View style={styles.receivablesContainer}>
                 <View>
@@ -117,6 +121,7 @@ const Details = () => {
                 </Pressable>
                 </View>
             )}
+            style={{flex: 1, overflow: 'scroll',}}
         />
     </View>
     </LinearGradient>
@@ -129,57 +134,58 @@ const styles = StyleSheet.create({
   gradient: {
     display: 'flex',
     flex: 1,
+    overflow: 'scroll',
   },
-    title: {
-        fontFamily: 'ZenDots',
-        fontWeight: 'bold',
-        color: '#00177d',
-        fontSize: 32,
-        marginBottom: 20,
-        alignSelf: 'center',
-        marginTop: 50,
-      },
-      subtitle: {
-        fontFamily: 'ZenDots',
-        fontWeight: 'bold',
-        color: '#00177d',
-        fontSize: 22,
-        marginBottom: 20,
-        alignSelf: 'center',
-        marginTop: 10,
-      },
-      listContainer: {
-        flexDirection: 'column',
-        gap: 2,
-        flex: 1,
-        alignItems: "center",
-        marginVertical: 10,
-      },
-      receivablesContainer: {
-        flexDirection: 'row',
-        gap: 20,
-        flex: 1,
-        alignItems: "center",
-        marginVertical: 10,
-        marginHorizontal: 10,
-        justifyContent: 'center',
+  title: {
+      fontFamily: 'ZenDots',
+      fontWeight: 'bold',
+      color: '#00177d',
+      fontSize: 32,
+      marginBottom: 20,
+      alignSelf: 'center',
+      marginTop: 50,
+  },
+  subtitle: {
+    fontFamily: 'ZenDots',
+    fontWeight: 'bold',
+    color: '#00177d',
+    fontSize: 22,
+    marginBottom: 20,
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  listContainer: {
+    flexDirection: 'column',
+    gap: 2,
+    flex: 1,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  receivablesContainer: {
+    flexDirection: 'row',
+    gap: 20,
+    flexGrow: 1,
+    alignItems: "center",
+    marginVertical: 10,
+    marginHorizontal: 10,
+    justifyContent: 'center',
 
-      },
-      inner: {
-        flexDirection: 'row',
-      },
-      detailText: {
-        color: '#00177d',
-        fontWeight: 'bold',
-      },
-      status: {
-        backgroundColor: 'green',
-        paddingVertical: 9,
-        paddingHorizontal: 14,
-        borderRadius: 5,
-      },
-      statusText: {
-        color: 'white',
-        fontWeight: 'bold',
-      },
+  },
+  inner: {
+    flexDirection: 'row',
+  },
+  detailText: {
+    color: '#00177d',
+    fontWeight: 'bold',
+  },
+  status: {
+    backgroundColor: 'green',
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 5,
+  },
+  statusText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 })
