@@ -34,6 +34,12 @@
         "projectId": "fc2bb0de-3b62-4e7b-96b7-662bfa3bfa4d"
       }
     },
-    "owner": "san4bt"
+    "owner": "san4bt",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/fc2bb0de-3b62-4e7b-96b7-662bfa3bfa4d"
+    }
   }
 }
