@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { TouchableOpacity, View, Text, TextInput, Image, StyleSheet, Alert } from 'react-native';
 import * as tf from '@tensorflow/tfjs';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { NavigationProp } from '@react-navigation/core';
 
-// Load local model files
+interface RouterProps {
+    navigation: NavigationProp<any, any>;
+}
+
 const modelJson = require('@/assets/model/model.json');
 const modelWeights = require('@/assets/model/group1-shard1of1.bin');
 
@@ -61,66 +67,169 @@ export default function InsightsScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>💰 Expense Prediction</Text>
+    <LinearGradient
+     colors={[
+        'rgba(255,238,178, 1)',
+        'rgba(253,162,255,1)',
+        'rgba(185,123,255,1)',
+        'rgba(26,0,97,1)',
+        'rgba(35, 0, 75, 1)',
+      ]}
+      style={styles.gradient}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>💰 Expense Predictor</Text>
 
-      <Text style={styles.label}>Number of Participants:</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        value={participants}
-        onChangeText={setParticipants}
-        placeholder="e.g. 3"
+        <View style={styles.inputCard}>
+          <Text style={styles.label}>👥 Participants</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            value={participants}
+            onChangeText={setParticipants}
+            placeholder="e.g. 3"
+            placeholderTextColor="#aaa"
+          />
+        </View>
+
+        <View style={styles.inputCard}>
+          <Text style={styles.label}>📅 Deadline Month (1-12)</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            value={deadlineMonth}
+            onChangeText={setDeadlineMonth}
+            placeholder="e.g. 7"
+            placeholderTextColor="#aaa"
+          />
+        </View>
+
+        <View style={styles.buttonWrapper}>
+          <TouchableOpacity onPress={handlePredict} style={styles.glassButton} activeOpacity={0.8}>
+            <Text style={styles.buttonText}>Predict Expense</Text>
+          </TouchableOpacity>
+        </View>
+
+        {prediction !== null && (
+          <View style={styles.resultCard}>
+            <Ionicons name="trending-up" size={24} color="#1e88e5" />
+            <Text style={styles.result}>${prediction.toFixed(2)}</Text>
+          </View>
+        )}
+      </View>
+      <Image
+        source={require('@/assets/assets/images/insights.png')}
+        style={styles.insights}
       />
-
-      <Text style={styles.label}>Deadline Month (1-12):</Text>
-      <TextInput
-        style={styles.input}
-        keyboardType="numeric"
-        value={deadlineMonth}
-        onChangeText={setDeadlineMonth}
-        placeholder="e.g. 7"
+      <Image
+        source={require('@/assets/assets/images/computer.png')}
+        style={styles.computer}
       />
-
-      <Button title="Predict Expense" onPress={handlePredict} />
-
-      {prediction !== null && (
-        <Text style={styles.result}>Predicted: ${prediction.toFixed(2)}</Text>
-      )}
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 24,
-    marginTop: 60,
-    backgroundColor: '#fff',
+  gradient: {
     flex: 1,
   },
+  container: {
+    flex: 1,
+    padding: 24,
+    marginTop: 90,
+  },
   title: {
-    fontSize: 26,
-    fontWeight: '600',
-    marginBottom: 30,
+    fontSize: 30,
+    fontFamily: 'ZenDots',
+    fontWeight: 'bold',
+    color: '#05008a',
     textAlign: 'center',
+    marginBottom: 30,
+  },
+  inputCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
   },
   label: {
-    fontSize: 16,
-    marginBottom: 6,
+    fontFamily:'PressStart2P',
+    color: '#05008a',
+    fontSize: 14,
+    marginBottom: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    color: '#fff7d1',
+    fontFamily: 'ZenDots',
     fontSize: 16,
+    paddingVertical: 6,
   },
-  result: {
-    marginTop: 25,
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1e88e5',
+  buttonWrapper: {
+    marginTop: 10,
+    marginBottom: 20,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  glassButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+  },
+  buttonText: {
+    fontFamily: 'ZenDots',
+    color: '#fff7d1',
+    fontSize: 18,
+    fontWeight: '600',
     textAlign: 'center',
   },
+  resultCard: {
+    marginTop: 30,
+    padding: 20,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    borderColor : 'rgba(255,255,255,0.1)',
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+  },
+  result: {
+    fontSize: 22,
+    fontFamily: 'Orbitron',
+    color: '#f0a207',
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
+  insights: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 110, 
+    height: 110,
+    opacity: 0.7,
+    transform: [{ rotate: '10deg' }],
+    zIndex: -1,
+  },
+  computer: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    width: 130, 
+    height: 130,
+    opacity: 0.7,
+    transform: [{ rotate: '350deg' }],
+    zIndex: -1,
+  }
 });
