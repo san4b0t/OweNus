@@ -11,6 +11,8 @@ import ActionButton from '@/assets/components/ActionButton';
 import AnimatedButton from '@/assets/components/AnimatedButton';
 import { WalletConnectModal, useWalletConnectModal } from '@walletconnect/modal-react-native';
 import * as Updates from 'expo-updates';
+import {numberToHex, sanitizeHex, utf8ToHex} from '@walletconnect/encoding';
+import { ethers } from 'ethers';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -20,7 +22,9 @@ const Dashboard = ({ navigation } : RouterProps) => {
 
   const { globUser, setGlobUser} = useContext(IdContext);
   const { userData, setUserData } = useContext(UserDataContext);
+  const [ trfAmt, setTrfAmt ] = useState(0);
   const user = FIREBASE_AUTH.currentUser;
+  
   
   const projectId = '0848228c792dfdbd3539a2bce980524d';
   const metadata = {
@@ -35,6 +39,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
   }
 
   const { open, isConnected, address, provider } = useWalletConnectModal();
+  
   const connect = async () => {
 
     console.log('working...')
