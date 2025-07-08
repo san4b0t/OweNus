@@ -5,7 +5,14 @@
 Chellappan Ramiah, A0303162W, Year 1 Computer Science  
 Sanfo Bimal Thomas, A0309330N, Year 1 Computer Science
 
-**Instructions to replicate and test are in project video**
+**Deployment link**
+
+**Install Expo Go App on your device to test**
+
+**Metamask connecting feature works best with android**
+
+https://expo.dev/preview/update?message=Merge%20pull%20request%20%2337%20from%20san4b0t%2Fai-updates%0A%0AAI%20updates&updateRuntimeVersion=1.0.0&createdAt=2025-07-06T12%3A54%3A39.123Z&slug=exp&projectId=fc2bb0de-3b62-4e7b-96b7-662bfa3bfa4d&group=8be2ba36-a846-4f4a-8a27-5a79b30b5926
+
 **Contents**
 
 **[1 Proof-of-Concept 3](#1-proof-of-concept)**
