@@ -1,0 +1,3 @@
+
+
+export const loadAsync = jest.fn(() => Promise.resolve());
