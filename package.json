@@ -27,6 +27,7 @@
     "expo": "~53.0.9",
     "expo-app-loading": "^1.1.2",
     "expo-camera": "^16.1.9",
+    "expo-cli": "^6.3.12",
     "expo-constants": "^17.1.6",
     "expo-font": "~13.3.1",
     "expo-gl": "^15.1.6",
