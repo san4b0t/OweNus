@@ -11,10 +11,14 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+    "types": ["jest", "node"]
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx"
-, "assets/components/AnimatedButton.js", "assets/components/DatePickerComponent.js", "assets/components/DatePickerComponent.js"  ]
+    "**/*.tsx",
+    "assets/components/AnimatedButton.js",
+    "assets/components/DatePickerComponent.js",
+    "jest.setup.js"
+  ]
 }
