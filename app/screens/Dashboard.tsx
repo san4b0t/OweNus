@@ -12,7 +12,7 @@ import AnimatedButton from '@/assets/components/AnimatedButton';
 import { WalletConnectModal, useWalletConnectModal } from '@walletconnect/modal-react-native';
 import * as Updates from 'expo-updates';
 import {numberToHex, sanitizeHex, utf8ToHex} from '@walletconnect/encoding';
-import { ethers } from 'ethers';
+import { ethers, JsonRpcProvider, formatEther } from 'ethers';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -59,13 +59,21 @@ const Dashboard = ({ navigation } : RouterProps) => {
     }
   };
 
-  const [reload, setReload] = useState<Boolean>(false);
-  useEffect(() => {
-    console.log('address change detected')
-    if (reload) {
-      reloadApp();
-    }
-  }, [address])
+// retrive wallet balance after successful connection
+async function fetchBalance(address: string) {
+  const provider = new JsonRpcProvider('https://testnet.riselabs.xyz');
+  const balance = await provider.getBalance(address);
+  const formattedBalance = formatEther(balance);
+  return formattedBalance;
+}
+
+const [balance, setBalance] = useState('0');
+
+useEffect(() => {
+  if (address) {
+    fetchBalance(address).then(bal => setBalance(bal));
+  }
+}, [address]);
 
 LogBox.ignoreLogs([
   'react-native-compat: Application module is not available',
@@ -161,7 +169,8 @@ LogBox.ignoreLogs([
       style={styles.gradient}>
       <View style={styles.infoCard}>
         <Text style={styles.header}>Welcome, {user?.displayName || 'User'}</Text>
-        <Text style={styles.balance}>Balance: ${userData?.balance || 0}</Text>
+        {/* <Text style={styles.balance}>Balance: ${userData?.balance || 0}</Text> */}
+        <Text style={styles.balance}>walletconnect balance (eth): {balance}</Text>
         <Text style={styles.subtitle1}>Recent Expenses:</Text>
         <FlatList
           data={expenses}
