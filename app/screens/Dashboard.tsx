@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, ScrollView, LogBox, Pressable, Animated } from 'react-native';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
-import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
 import { db } from '../../FirebaseConfig';
 import { IdContext } from '@/Global/IdContext';
 import { UserDataContext } from '@/Global/UserDataContext';
@@ -13,10 +13,13 @@ import { WalletConnectModal, useWalletConnectModal } from '@walletconnect/modal-
 import * as Updates from 'expo-updates';
 import {numberToHex, sanitizeHex, utf8ToHex} from '@walletconnect/encoding';
 import { ethers, JsonRpcProvider, formatEther } from 'ethers';
+import { TransferService } from '../services/TransferService';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
+
+
 
 const Dashboard = ({ navigation } : RouterProps) => {
 
@@ -37,6 +40,50 @@ const Dashboard = ({ navigation } : RouterProps) => {
       universal: 'YOUR_APP_UNIVERSAL_LINK.com',
     }
   }
+
+  const [price, setPrice] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<any>(null);
+
+  const fetchPrice = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=sgd');
+      const data = await response.json();
+      setPrice(data.ethereum.sgd);
+      console.log('price' + price)
+      if (price) setUserBalance(globUser, Math.round(price * parseFloat(balance) * 100) / 100);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch price');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setUserBalance = async (uid: string, amount: number) => {
+      const userDoc = await getUserDocument(uid);
+      await updateDoc(userDoc.ref, {
+        balance: amount      
+    });
+  }
+
+  const getUserDocument = async (uid: string) => {
+      const q = query(collection(db, 'users'), where('uid', '==', uid));
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) throw new Error('User not found');
+      return snapshot.docs[0];
+  }
+
+  useEffect(() => {
+    fetchPrice();
+    
+    // Refresh every 60 seconds
+    const interval = setInterval(fetchPrice, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const { open, isConnected, address, provider } = useWalletConnectModal();
   
@@ -72,6 +119,7 @@ const [balance, setBalance] = useState('0');
 useEffect(() => {
   if (address) {
     fetchBalance(address).then(bal => setBalance(bal));
+    console.log(balance);
   }
 }, [address]);
 
@@ -169,8 +217,10 @@ LogBox.ignoreLogs([
       style={styles.gradient}>
       <View style={styles.infoCard}>
         <Text style={styles.header}>Welcome, {user?.displayName || 'User'}</Text>
-        {/* <Text style={styles.balance}>Balance: ${userData?.balance || 0}</Text> */}
-        <Text style={styles.balance}>walletconnect balance (eth): {balance}</Text>
+        <Text style={styles.balance}>walletconnect balance (SGD): {price ? (price * parseFloat(balance)).toLocaleString('en-SG', {
+        style: 'currency',
+        currency: 'SGD'
+      }) : 'error'}</Text>
         <Text style={styles.subtitle1}>Recent Expenses:</Text>
         <FlatList
           data={expenses}
@@ -229,11 +279,11 @@ LogBox.ignoreLogs([
             label="Transfer"
             onPress={() => navigation.navigate('Transfer')}
           />
-          <ActionButton
+          {/* <ActionButton
             imageSource={require('@/assets/assets/images/topup.png')}
             label="Top Up"
             onPress={() => navigation.navigate('Top Up')}
-          />
+          /> */}
           <ActionButton
             imageSource={require('@/assets/assets/images/details.png')}
             label="Balances"

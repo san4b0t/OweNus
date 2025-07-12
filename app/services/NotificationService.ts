@@ -5,7 +5,7 @@ import { db, FIREBASE_AUTH } from '../../FirebaseConfig';
 import { User } from 'firebase/auth';
 import { Notification, NotificationResponse, TimeIntervalTriggerInput } from 'expo-notifications';
 
-// Set notification handler for Expo
+// notification handler
 Notifications.setNotificationHandler({
   handleNotification: async (notification: Notification) => ({
     shouldShowAlert: true,
@@ -52,13 +52,13 @@ export async function schedulePaymentReminder(expenseId: string, deadline: Date)
   }
 
   try {
-    // Calculate time until deadline
+    // time before payment is due
     const now = new Date();
     const timeUntilDeadline = deadline.getTime() - now.getTime();
     const hoursUntilDeadline = Math.floor(timeUntilDeadline / (1000 * 60 * 60));
     console.log(`Hours until deadline: ${hoursUntilDeadline}`);
 
-    // If deadline is within 24 hours, show immediate notification
+    // show immeidiate notification of deadline is within 24hrs
     if (hoursUntilDeadline <= 24) {
       console.log('Scheduling immediate notification');
       await Notifications.scheduleNotificationAsync({
@@ -75,7 +75,7 @@ export async function schedulePaymentReminder(expenseId: string, deadline: Date)
         } as any,
       });
     } else {
-      // Schedule notification 24 hours before deadline
+      // schedule message 24 hrs before deadline
       console.log('Scheduling notification for 24 hours before deadline');
       const trigger = {
         type: 'timeInterval',
@@ -94,7 +94,7 @@ export async function schedulePaymentReminder(expenseId: string, deadline: Date)
       });
     }
 
-    // Update Firebase with notification status
+    // update firebase with notification status
     const notificationsRef = collection(db, 'notifications');
     await updateDoc(doc(notificationsRef, expenseId), {
       scheduled: true,
@@ -154,7 +154,7 @@ export async function listenForPaymentReminders() {
           const deadline = new Date(notificationData.deadline);
           const now = new Date();
           
-          // If deadline is within 24 hours, show immediate notification
+          // show immediate notification of deadline within 24hrs
           if (deadline.getTime() - now.getTime() <= 24 * 60 * 60 * 1000) {
             await Notifications.presentNotificationAsync({
               title: 'Payment Due Today',
@@ -185,7 +185,7 @@ export async function listenForPaymentReminders() {
         const deadline = expense.deadline?.toDate();
         
         if (deadline) {
-          // Schedule notification if it's not already scheduled
+          // schedule message 24 hrs before deadline
           await schedulePaymentReminder(change.doc.id, deadline);
         }
       }

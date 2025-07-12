@@ -2,11 +2,13 @@ import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { UserDataContext } from '@/Global/UserDataContext';
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { View, Text, TextInput, StyleSheet, Alert, Image } from 'react-native';
 import ActionButton from '@/assets/components/ActionButton';
 import { TransferService } from '../services/TransferService';
 import { WalletConnectModal, useWalletConnectModal } from '@walletconnect/modal-react-native';
+import * as Updates from 'expo-updates';
+import { IdContext } from '@/Global/IdContext';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -17,18 +19,64 @@ const Transfer = ({ navigation }: RouterProps) => {
   const [friendName, setFriendName] = useState('');
   const [amount, setAmount] = useState('');
   const { open, isConnected, address, provider } = useWalletConnectModal();
+  const { globUser, setGlobUser} = useContext(IdContext);
+  const [balance, setBalance] = useState('0');
+  
+
+  const reloadApp = async () => {
+      try {
+        await Updates.reloadAsync();
+      } catch (error) {
+        console.error("Failed to reload app:", error);
+      }
+    };
+
+
+  const [price, setPrice] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<any>(null);
+  
+    const fetchPrice = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=sgd');
+        const data = await response.json();
+        setPrice(data.ethereum.sgd);
+        console.log('price' + price)
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch price');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    useEffect(() => {
+      fetchPrice();
+      
+      // Refresh every 60 seconds
+      const interval = setInterval(fetchPrice, 60000);
+      
+      return () => clearInterval(interval);
+    }, []);
 
   const onSendTransaction = async (wid: string) => {
     if (!provider) {
       return;
     }
-  
     const chainId = await provider.request({
       method: 'eth_chainId',
     });
-    const hexAmt = '0x' + (parseFloat(amount) * 1000000000000000000).toString(16);
+    if (price === null || price === 0) {
+      Alert.alert('Error', 'Unable to fetch Ethereum price. Please try again later.');
+      return;
+    }
+    console.log(price)
+    const ethAmt = Math.round((parseFloat(amount) / price) * 1e6) / 1e6;
+    console.log(ethAmt);
+    const hexAmt = '0x' + (ethAmt * 1000000000000000000).toString(16);
     console.log(hexAmt);
-  
     const transaction = {
       from: address,
       to: wid,
@@ -99,12 +147,12 @@ const Transfer = ({ navigation }: RouterProps) => {
           -amountNumber
         )
       ]);
-      console.log(friendData.walletId)
-      onSendTransaction(friendData.walletId);
+      console.log('walletid:' + friendData.walletId)
+      onSendTransaction(friendData.walletId).then(reloadApp);
 
       Alert.alert(
-        'Success', 
-        `Successfully transferred $${amountNumber.toFixed(2)} to ${friendName}`,
+        'Received', 
+        `Commencing transfer $${amountNumber.toFixed(2)} to ${friendName}`,
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
     } catch (error: any) {
