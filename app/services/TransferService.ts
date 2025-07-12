@@ -1,6 +1,7 @@
 // src/services/transactionService.ts
 import { db } from '@/FirebaseConfig';
 import { addDoc, collection, doc, getDocs, query, updateDoc, where, increment } from 'firebase/firestore';
+import { useState } from 'react';
 
 export const TransferService = {
   async findUserByName(name: string) {
@@ -57,5 +58,17 @@ export const TransferService = {
     const snapshot = await getDocs(q);
     if (snapshot.empty) throw new Error('User not found');
     return snapshot.docs[0];
+  },
+  
+ async fetchPrice () {
+    try {
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=sgd');
+      const data = await response.json();
+      const price = data.ethereum.sgd;
+      return price ? price : Error
+    } catch (err) {
+      console.error(err);
+    }
   }
+  
 };
