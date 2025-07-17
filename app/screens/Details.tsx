@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable, Alert, ScrollView } from 'react-native';
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
 import { db, FIREBASE_AUTH } from '../../FirebaseConfig';
+import { CreditScoringService } from '../services/CreditScoringService';
 
 const Details = () => {
 
@@ -75,6 +76,8 @@ const Details = () => {
           paymentDiff: daysLate,
         });
         console.log(diff);
+        const res = await CreditScoringService.calculateCreditScore();
+        console.log(res);
       } catch (error) {
         console.error('Error updating status:', error);
       }
