@@ -25,7 +25,8 @@ export const AddExpenseService = {
       date: formattedDate, 
       time: now.toLocaleTimeString(),
       deadline: deadlineTimestamp, 
-      status: 'pending'
+      status: 'pending',
+      paymentDiff: 0,
     });
 
     // update user balance as they pay for the expense

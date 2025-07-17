@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc } from "firebase/firestore";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable, Alert, ScrollView } from 'react-native';
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
 import { db, FIREBASE_AUTH } from '../../FirebaseConfig';
 
 const Details = () => {
@@ -59,10 +59,22 @@ const Details = () => {
           return;
         }
         const receivableRef = doc(db, 'indivExpenses', receivableId);
-        await updateDoc(receivableRef, { 
-          status: 'paid'
-        });
         console.log('Status updated to paid');
+
+        const expenseData = (await getDoc(receivableRef)).data();
+        const deadline = expenseData?.deadline;
+        const diff = (deadline?.toDate?.().getTime?.() ?? new Date(deadline).getTime()) - new Date().getTime();
+        const daysLate = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        if (diff < 0) {
+          Alert.alert('Payment was late by', `${-daysLate} day(s)`);
+        } else {
+          Alert.alert('Payment was on time');
+        }
+        await updateDoc(receivableRef, { 
+          status: 'paid',
+          paymentDiff: daysLate,
+        });
+        console.log(diff);
       } catch (error) {
         console.error('Error updating status:', error);
       }
@@ -75,7 +87,11 @@ const Details = () => {
     <View>
         <Text style={styles.title}>Balances</Text>
         <Text style={styles.subtitle}>Pending Balances You Owe:</Text>
-        <FlatList
+        <ScrollView
+                  bounces={false}
+                  overScrollMode="never"
+                  contentContainerStyle={{ minHeight: '50%' }}>
+        {/* <FlatList
             data={expenses}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
@@ -94,7 +110,7 @@ const Details = () => {
                 }) : 'no deadline set'}</Text>
                 </View>
             )}
-        />
+        /> */}
         <Text style={styles.subtitle}>Pending Receivables:</Text>
         <FlatList
             data={receivables}
@@ -121,6 +137,7 @@ const Details = () => {
             )}
             style={{flex: 1, overflow: 'scroll',}}
         />
+    </ScrollView>
     </View>
     </LinearGradient>
   )
