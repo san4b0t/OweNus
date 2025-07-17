@@ -78,7 +78,6 @@ const Details = () => {
         <FlatList
             data={expenses}
             keyExtractor={item => item.id}
-            scrollEnabled={false}
             renderItem={({ item }) => (
                 <View style={styles.listContainer}>
                 <View style={styles.inner}>
@@ -100,7 +99,6 @@ const Details = () => {
         <FlatList
             data={receivables}
             keyExtractor={item => item.id}
-            scrollEnabled={false}
             renderItem={({ item }) => (
                 <View style={styles.receivablesContainer}>
                 <View>
