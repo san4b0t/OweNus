@@ -4,8 +4,15 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, Pressable, Alert, S
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
 import { db, FIREBASE_AUTH } from '../../FirebaseConfig';
 import { CreditScoringService } from '../services/CreditScoringService';
+import ActionButton from '@/assets/components/ActionButton';
+import AnimatedButton from '@/assets/components/AnimatedButton';
+import { NavigationProp } from '@react-navigation/core';
 
-const Details = () => {
+interface RouterProps {
+    navigation: NavigationProp<any, any>;
+}
+
+const Details = ({ navigation } : RouterProps) => {
 
     const user = FIREBASE_AUTH.currentUser;
     const [expenses, setExpenses] = useState<{ id: string; [key: string]: any }[]>([]);
@@ -87,21 +94,19 @@ const Details = () => {
      <LinearGradient 
      colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} 
      style={styles.gradient}>
-    <View>
-        <Text style={styles.title}>Balances</Text>
-        <Text style={styles.subtitle}>Pending Balances You Owe:</Text>
+    <Text style={styles.title}>Balances</Text>
+    <Text style={styles.subtitle}>Pending Balances You Owe:</Text>
+    <View style={styles.topCont}>
         <ScrollView
-                  bounces={false}
-                  overScrollMode="never"
-                  contentContainerStyle={{ minHeight: '50%' }}>
-        {/* <FlatList
-            data={expenses}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
+          bounces={false}
+          overScrollMode="never"
+          contentContainerStyle={{ minHeight: '50%' }}>
+          {receivables.map(item => (
+              <View key={item.id} style={styles.listContainer}>
                 <View style={styles.listContainer}>
                 <View style={styles.inner}>
                     <Text style={styles.detailText}>{item.description} | Paid By: {item.paidByName}</Text>
-                    <Text style={styles.detailText}> | Amount owed: ${item.amount}</Text>
+                    <Text style={styles.detailText}> | Amount owed: ${item.amount.toFixed(2)}</Text>
                 </View>
                 <Text style={styles.detailText}>Deadline: {item.deadline ? 
                 item.deadline
@@ -112,36 +117,40 @@ const Details = () => {
                     year: 'numeric',
                 }) : 'no deadline set'}</Text>
                 </View>
-            )}
-        /> */}
-        <Text style={styles.subtitle}>Pending Receivables:</Text>
-        <FlatList
-            data={receivables}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-                <View style={styles.receivablesContainer}>
-                <View>
-                <View style={styles.inner}>
+              </View>
+            ))}
+        </ScrollView>
+      </View>
+    <Text style={styles.subtitle}>Pending Receivables:</Text>
+    <View style={styles.verticalButtons}>
+        <ScrollView
+          bounces={false}
+          overScrollMode="never"
+          contentContainerStyle={{ minHeight: '50%' }}>
+          {receivables.map(item => (
+              <View key={item.id} style={styles.receivablesContainer}>
+                <View style={{  maxWidth: '60%',}}>
+                  <View style={styles.inner}>
                     <Text style={styles.detailText}>{item.description} | Receivable from: {item.participant}</Text>
-                </View>
-                <Text style={styles.detailText}>Amount Owed: ${item.amount} | Deadline: {item.deadline ? 
-                item.deadline
-                .toDate()
-                .toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                }) : 'no deadline set'}</Text>
+                  </View>
+                  <Text style={styles.detailText}>
+                    Amount Owed: ${item.amount.toFixed(2)} | Deadline: {item.deadline ? 
+                    item.deadline
+                    .toDate()
+                    .toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                    }) : 'no deadline set'}
+                  </Text>
                 </View>
                 <Pressable onPress={() => markAsPaid(item.id)} style={styles.status}>
-                    <Text style={styles.statusText}>Settled</Text>
+                  <Text style={styles.statusText}>Settled</Text>
                 </Pressable>
-                </View>
-            )}
-            style={{flex: 1, overflow: 'scroll',}}
-        />
-    </ScrollView>
-    </View>
+              </View>
+            ))}
+        </ScrollView>
+      </View>
     </LinearGradient>
   )
 }
@@ -159,25 +168,33 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       color: '#00177d',
       fontSize: 32,
-      marginBottom: 20,
       alignSelf: 'center',
-      marginTop: 50,
+      marginTop: 10,
   },
   subtitle: {
     fontFamily: 'ZenDots',
     fontWeight: 'bold',
     color: '#00177d',
     fontSize: 22,
-    marginBottom: 20,
+    marginBottom: 10,
     alignSelf: 'center',
     marginTop: 10,
+  },
+  subtitle2: {
+    fontFamily: 'ZenDots',
+    fontWeight: 'bold',
+    color: '#00177d',
+    fontSize: 22,
+    marginBottom: 10,
+    alignSelf: 'center',
+    marginTop: 15,
   },
   listContainer: {
     flexDirection: 'column',
     gap: 2,
     flex: 1,
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 4,
   },
   receivablesContainer: {
     flexDirection: 'row',
@@ -187,7 +204,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 10,
     justifyContent: 'center',
-
   },
   inner: {
     flexDirection: 'row',
@@ -206,4 +222,22 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  scroll: {
+    flexDirection: 'column',
+    gap: 6,
+    flex: 1,
+    paddingBottom: 40,
+  },
+  verticalButtons: {
+    flexDirection: 'column',
+    gap: 6,
+    flex: 1,
+    paddingBottom: '30%',
+  },
+  topCont: {
+    flexDirection: 'column',
+    gap: 6,
+    flex: 1,
+    maxHeight: '30%',
+  }
 })
