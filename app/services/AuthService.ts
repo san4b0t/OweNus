@@ -23,6 +23,16 @@ export const Auth = {
         createdAt: new Date(),
       });
 
+      await setDoc(doc(db, 'weights', userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        paymentHistory: 0,
+        totalAmountOwed: 0,
+        activeExpenses: 0,
+        avgSettlementTime: 0,
+        missedPayments: 0,
+        totalExpenses: 0,
+      })
+
       return userCredential.user;
     } catch (error) {
       throw error;
