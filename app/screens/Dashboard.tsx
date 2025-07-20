@@ -275,6 +275,11 @@ LogBox.ignoreLogs([
           overScrollMode="never"
           contentContainerStyle={{ minHeight: '50%' }}>
           <ActionButton
+            imageSource={require('@/assets/assets/images/profile.png')}
+            label="Profile"
+            onPress={() => navigation.navigate('Profile')}
+          />
+          <ActionButton
             imageSource={require('@/assets/assets/images/transfer.png')}
             label="Transfer"
             onPress={() => navigation.navigate('Transfer')}

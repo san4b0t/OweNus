@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db, FIREBASE_AUTH } from '@/FirebaseConfig';
 import { Alert } from 'react-native';
 
@@ -12,46 +12,35 @@ export const CreditScoringService = {
     const user = FIREBASE_AUTH.currentUser;
     if (!user) throw new Error('User not authenticated');
 
-    // Fetch paid expenses with paymentDiff field
-    const expensesQuery = query(
-      collection(db, 'indivExpenses'),
-      where('participant', '==', user.uid),
-      where('status', '==', 'paid'),
-      orderBy('createdAt', 'desc')
-    );
+    const weightsRef = doc(db, 'weights', user.uid);
+    const weightsSnap = await getDoc(weightsRef);
 
-    const snapshot = await getDocs(expensesQuery);
-    const expenses = snapshot.docs.map(doc => doc.data());
-
-    if (expenses.length === 0) {
+    if (!weightsSnap.exists()) {
       return {
         score: 100,
         status: 'excellent'
       };
     }
 
-    let score = 100;
+    const data = weightsSnap.data();
 
-    expenses.forEach(expense => {
-      const paymentDiff = expense.paymentDiff ?? 0;
-      if (paymentDiff <= 0) {
-        // On time or early: small bonus (cap at 100)
-        score = Math.min(score + 2, 100);
-      } else {
-        // Late payments: subtract 5 points per day late
-        score -= 5 * paymentDiff;
-      }
-    });
+    // Weighted scoring model
+    let score =
+      0.4 * (data.paymentHistory ?? 0) +
+      0.1 * (data.avgSettlementTime ?? 0) +
+      0.2 * (data.missedPayments ?? 0) +
+      0.15 * (data.totalAmountOwed ?? 0) +
+      0.1 * (data.activeExpenses ?? 0) +
+      0.05 * (data.totalExpenses ?? 0);
 
-    // Clamp score between 0 and 100
-    score = Math.max(0, Math.min(score, 100));
+    score = Math.max(0, Math.min(Math.round(score), 100));
 
     const res = {
       score,
       status: this.determineCreditStatus(score)
     };
     console.log(res);
-    Alert.alert(res.toString());
+    Alert.alert(`Credit Score: ${res.score}`, `Status: ${res.status}`);
     return res;
   },
 
