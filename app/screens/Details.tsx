@@ -83,12 +83,11 @@ const Details = ({ navigation } : RouterProps) => {
           paymentDiff: daysLate,
         });
         console.log(diff);
-        const res = await CreditScoringService.calculateCreditScore();
-        console.log(res);
       } catch (error) {
         console.error('Error updating status:', error);
       }
     };
+
 
   return (
      <LinearGradient 
