@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, Alert, StyleSheet, Image, Switch, FlatList } from 'react-native';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { View, Text, TextInput, Alert, StyleSheet, Image, Switch, ScrollView, Keyboard, TouchableWithoutFeedback, } from 'react-native';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionButton from '@/assets/components/ActionButton';
@@ -8,6 +8,7 @@ import { AddExpenseService } from '../services/AddExpenseService';
 import DatePickerComponent from '@/assets/components/DatePickerComponent';
 import { DateContext } from '@/Global/DateContext';
 import { FIREBASE_AUTH, db } from '../../FirebaseConfig';
+import { CreditScoringService } from '../services/CreditScoringService';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -21,7 +22,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
   const [participants, setParticipants] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [friends, setFriends] = useState<string[]>([]);
+  const [friends, setFriends] = useState<Array<[string, string]>>([]);
   const [custom, setCustom] = useState(false);
   const [splits, setSplits] = useState('');
 
@@ -35,7 +36,15 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
       where('userId', '==', user.uid)
     );
     const snapshot = await getDocs(friendsQuery);
-    setFriends(snapshot.docs.map(doc => doc.data().friendName));
+
+    const friendsData = await Promise.all(
+      snapshot.docs.map(async doc => {
+        const friendName = doc.data().friendName;
+        const score = await CreditScoringService.calculateCustomCreditScore(doc.data().friendId);
+        return [friendName, score] as [string, string];
+      })
+    );
+    setFriends(friendsData);
   };
 
   useEffect(() => {
@@ -86,6 +95,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
 
   return (
     <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <LinearGradient colors = {['rgb(157, 255, 252)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} style={styles.gradient}>
       {/* <Image source={require('@/assets/assets/images/money-cash.gif')} style={styles.expense}/> */}
       <Text style={styles.title}>Add New Expense</Text>
@@ -102,6 +112,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         value={description}
         onChangeText={setDescription}
       />
+      
       <TextInput
         style={styles.input}
         placeholder="Amount"
@@ -109,6 +120,7 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
         onChangeText={setAmount}
         keyboardType="numeric"
       />
+      
       <TextInput
         style={styles.input}
         placeholder="Participant usernames (comma separated)"
@@ -131,26 +143,30 @@ const AddExpenseScreen = ({ navigation }: RouterProps) => {
           
         />
       <Text style={styles.subtitle}>Your Friends</Text>
-      <FlatList
-        data={friends}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-        <View style={styles.friendItem}>
-          <Text style={styles.friends}>{item}</Text>
-        </View>
-        )}
-        style = {styles.listContainer}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Image
-              source={require('@/assets/assets/images/nofriends.png')} // 
-              style={styles.emptyImage}
-            />
-          <Text style={styles.emptyText}>"you tried to console.log(myFriends) but it returned an empty array... guess you need to fetch some new ones!"</Text>
-          </View>
-        }
-        />
+      <ScrollView style={styles.listContainer}
+        bounces={false}
+        overScrollMode="never"
+        contentContainerStyle={{ minHeight: '50%' }}>
+  {friends.length > 0 ? (
+    friends.map((item: any) => (
+      <View style={styles.friendItem} key={item[0]}>
+        <Text style={styles.friends}>{item[0] + item[1]}</Text>
+      </View>
+    ))
+  ) : (
+    <View style={styles.emptyContainer}>
+      <Image
+        source={require('@/assets/assets/images/nofriends.png')}
+        style={styles.emptyImage}
+      />
+      <Text style={styles.emptyText}>
+        "you tried to console.log(myFriends) but it returned an empty array... guess you need to fetch some new ones!"
+      </Text>
+    </View>
+  )}
+</ScrollView>
       </LinearGradient>
+      </TouchableWithoutFeedback>
     </View>
   );
 };

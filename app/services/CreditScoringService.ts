@@ -14,7 +14,7 @@ export const CreditScoringService = {
 
     const indivExpensesQuery = query(
       collection(db, 'indivExpenses'),
-      where('paidBy', '==', user.uid),
+      where('participantId', '==', user.uid),
       orderBy('createdAt', 'desc')
     );
 
@@ -73,6 +73,68 @@ export const CreditScoringService = {
     };
     console.log(res);
     Alert.alert(`Credit Score: ${res.score}`, `Status: ${res.status}`);
+    return res;
+  },
+
+  async calculateCustomCreditScore(id: string): Promise<string> {
+
+    const indivExpensesQuery = query(
+      collection(db, 'indivExpenses'),
+      where('participantId', '==', id),
+      orderBy('createdAt', 'desc')
+    );
+
+    const indivExpensesSnapshot = await getDocs(indivExpensesQuery);
+    const indivExpenses = indivExpensesSnapshot.docs.map(doc => doc.data());
+
+    const weightsRef = doc(db, 'weights', id);
+    const weightsSnap = await getDoc(weightsRef);
+
+    if (!weightsSnap.exists()) {
+      await setDoc(doc(db, 'weights', id), {
+                uid: id,
+                paymentHistory: 0,
+                totalAmountOwed: 0,
+                activeExpenses: 0,
+                avgSettlementTime: 0,
+                missedPayments: 0,
+                totalExpenses: 0,
+              })
+      return this.calculateCustomCreditScore(id);
+    }
+
+    await updateDoc(doc(db, 'weights', id), {
+      paymentHistory: await this.calculatePaymentHistory(indivExpenses),
+      totalAmountOwed: await this.calculateTotalAmountOwed(indivExpenses),
+      activeExpenses: await this.calculateActiveExpenses(indivExpenses),
+      avgSettlementTime: await this.calculateAvgSettlementTime(indivExpenses),
+      missedPayments: await this.calculateMissedPayments(indivExpenses),
+      totalExpenses: indivExpenses.length,
+    })
+
+    const weightsRef2 = doc(db, 'weights', id);
+    const weightsSnap2 = await getDoc(weightsRef2);
+
+    const data = weightsSnap2.data();
+
+    //weighted scoring model
+    let score = data?.totalExpenses == 0 ? 100 :
+      0.4 * (data?.paymentHistory ?? 0) +
+      0.1 * (data?.avgSettlementTime ?? 0) +
+      0.2 * (data?.missedPayments ?? 0) +
+      0.15 * (data?.totalAmountOwed ?? 0) +
+      0.1 * (data?.activeExpenses ?? 0) +
+      0.05 * (data?.totalExpenses ?? 0);
+
+    score = Math.max(0, Math.min(Math.round(score), 100));
+
+    const userRef = doc(db, 'users', id);
+    await updateDoc(userRef, {
+      creditScore: score
+    });
+
+    const res = " credit score: " + score + " (" + this.determineCreditStatus(score) + ")";
+    console.log(res);
     return res;
   },
 

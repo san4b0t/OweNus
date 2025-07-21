@@ -26,7 +26,6 @@ export const AddExpenseService = {
       time: now.toLocaleTimeString(),
       deadline: deadlineTimestamp, 
       status: 'pending',
-      paymentDiff: 0,
     });
 
     // update user balance as they pay for the expense
@@ -34,9 +33,11 @@ export const AddExpenseService = {
 
     // update amount owed for each participant in the expense
     const amountPerPerson = amount / participantNames.length;
+    console.log(participantNames);
     await Promise.all(
       participantNames.map(async (name) => {
-        
+        if (name.trim() === user.displayName) return;
+
         const participant = await this.findUserByName(name.trim());
 
         // add indiv expense object with deadline for each participant
