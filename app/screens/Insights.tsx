@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, View, Text, TextInput, Image, StyleSheet, Alert } from 'react-native';
+import { TouchableOpacity, View, Text, TextInput, Image, StyleSheet, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import * as tf from '@tensorflow/tfjs';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -67,6 +67,7 @@ export default function InsightsScreen() {
   }
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <LinearGradient
      colors={[
         'rgba(255,238,178, 1)',
@@ -126,6 +127,7 @@ export default function InsightsScreen() {
         style={styles.computer}
       />
     </LinearGradient>
+    </TouchableWithoutFeedback>
   );
 }
 

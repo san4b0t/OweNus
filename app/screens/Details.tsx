@@ -100,7 +100,7 @@ const Details = ({ navigation } : RouterProps) => {
           bounces={false}
           overScrollMode="never"
           contentContainerStyle={{ minHeight: '50%' }}>
-          {receivables.map(item => (
+          {expenses.map(item => (
               <View key={item.id} style={styles.listContainer}>
                 <View style={styles.listContainer}>
                 <View style={styles.inner}>
