@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Pressable, Text, Image, StyleSheet, View } from 'react-native';
 
-const ActionButton = ({ imageSource, label, onPress }) => {
+const ActionButton = ({ imageSource, label, onPress, testID }) => {
   const [isPressed, setIsPressed] = useState(false);
 
   return (
-    <View style={[styles.wrapper]}>
+    <View style={styles.wrapper}>
       <Pressable
+        testID={testID} 
         onPress={onPress}
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     width: '100%',
-    gap: 5
+    gap: 5,
   },
   actionButtonPressed: {
     borderColor: '#38BDF8',

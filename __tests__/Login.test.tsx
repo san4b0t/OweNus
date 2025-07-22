@@ -1,15 +1,14 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import Login from '../app/screens/Login'; // adjust path
+import Login from '../app/screens/Login';
 import { IdContext } from '@/Global/IdContext';
 import { Auth } from '../app/services/AuthService';
 
-// Mock expo-font
 jest.mock('expo-font', () => ({
   loadAsync: jest.fn(() => Promise.resolve()),
 }));
 
-// Mock Auth service
+
 jest.mock('../app/services/AuthService', () => ({
   Auth: {
     signIn: jest.fn(),

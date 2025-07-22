@@ -275,41 +275,49 @@ LogBox.ignoreLogs([
           overScrollMode="never"
           contentContainerStyle={{ minHeight: '50%' }}>
           <ActionButton
+            testID="profileButton"
             imageSource={require('@/assets/assets/images/profile.png')}
             label="Profile"
             onPress={() => navigation.navigate('Profile')}
           />
+
           <ActionButton
+            testID="transferButton"
             imageSource={require('@/assets/assets/images/transfer.png')}
             label="Transfer"
             onPress={() => navigation.navigate('Transfer')}
           />
-          {/* <ActionButton
-            imageSource={require('@/assets/assets/images/topup.png')}
-            label="Top Up"
-            onPress={() => navigation.navigate('Top Up')}
-          /> */}
+
           <ActionButton
+            testID="balancesButton"
             imageSource={require('@/assets/assets/images/details.png')}
             label="Balances"
             onPress={() => navigation.navigate('Details')}
           />
+
           <ActionButton
+            testID="friendsButton"
             imageSource={require('@/assets/assets/images/friends.png')}
             label="Friends"
             onPress={() => navigation.navigate('Friends')}
           />
+
           <ActionButton
+            testID="addExpenseButton"
             imageSource={require('@/assets/assets/images/expenses.png')}
             label="Add Expense"
             onPress={() => navigation.navigate('Add Expense')}
           />
+
           <ActionButton
+            testID="insightsButton"
             imageSource={require('@/assets/assets/images/insights.png')}
             label="Insights"
             onPress={() => navigation.navigate('Insights')}
           />
+
           <ActionButton
+            testID="logoutButton"
             imageSource={require('@/assets/assets/images/logout.png')}
             label="Logout"
             onPress={() => FIREBASE_AUTH.signOut()}
