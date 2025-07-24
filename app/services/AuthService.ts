@@ -4,6 +4,8 @@ import { FIREBASE_AUTH, db } from '../../FirebaseConfig';
 
 export const Auth = {
   async signUp(email: string, password: string, name: string) {
+    if (email == "" || password == "" || name == "") throw console.error("Please fill all fields");
+    
     try {
       const userCredential = await createUserWithEmailAndPassword(
         FIREBASE_AUTH,

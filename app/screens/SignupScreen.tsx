@@ -17,12 +17,14 @@ const SignupScreen = ({ navigation }: RouterProps) => {
 
   const handleSignup = async () => {
     if (!name || !email || !password) {
+
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
 
     try {
       await Auth.signUp(email, password, name);
+
     } catch (error: any) {
       Alert.alert('Error', error.message);
     } 
