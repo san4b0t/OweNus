@@ -341,8 +341,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     borderRadius: 20,
     alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 10,
+    marginBottom: 10,
   },
   gradient: {
     display: 'flex',

@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "OweNus",
+    "slug": "OweNus",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/assets/images/owenus.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/assets/images/owenus.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/assets/images/owenus.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.san4bt.OweNus",
+      "versionCode": 1,
+      "config": {
+        "googleSignIn": {
+          "apiKey": "YOUR_GOOGLE_SIGN_IN_API_KEY"
+        }
+      },
+      "permissions": [
+        "NOTIFICATIONS",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "softwareKeyboardLayoutMode": "pan",
+      "useNextNotificationsApi": true
+    },
+    "web": {
+      "favicon": "./assets/assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fc2bb0de-3b62-4e7b-96b7-662bfa3bfa4d"
+      }
+    },
+    "owner": "san4bt",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/fc2bb0de-3b62-4e7b-96b7-662bfa3bfa4d"
+    }
+  }
+}

@@ -92,10 +92,12 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         paddingTop: 10,
+        
     },
   gradient: {
     display: 'flex',
     flex: 1,
+
   },
   heading: {
     marginTop: 12,

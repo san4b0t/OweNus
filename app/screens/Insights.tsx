@@ -68,16 +68,9 @@ export default function InsightsScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-    <LinearGradient
-     colors={[
-        'rgba(255,238,178, 1)',
-        'rgba(253,162,255,1)',
-        'rgba(185,123,255,1)',
-        'rgba(26,0,97,1)',
-        'rgba(35, 0, 75, 1)',
-      ]}
-      style={styles.gradient}
-    >
+    <LinearGradient 
+         colors = {['rgba(153, 255, 252, 1)', 'rgba(61,150,185,1)','rgba(61,150,185,1)','rgba(15,0,87,1)']} 
+         style={styles.gradient}>
       <View style={styles.container}>
         <Text style={styles.title}>💰 Expense Predictor</Text>
 
@@ -113,7 +106,7 @@ export default function InsightsScreen() {
 
         {prediction !== null && (
           <View style={styles.resultCard}>
-            <Ionicons name="trending-up" size={24} color="#1e88e5" />
+            <Ionicons name="trending-up" size={24} color="#ffa600ff" />
             <Text style={styles.result}>${prediction.toFixed(2)}</Text>
           </View>
         )}
