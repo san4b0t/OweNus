@@ -1,0 +1,35 @@
+{
+  "cli": {
+    "version": "^16.13.2"
+  },
+  "build": {
+    "development": {
+      "developmentClient": false,
+      "distribution": "internal",
+      "channel": "development",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug",
+        "gradleFlags": [
+          "-Dorg.gradle.daemon=false",
+          "-Dorg.gradle.parallel=false",
+          "-Dorg.gradle.jvmargs=-Xmx2048m"
+        ],
+        "buildProperties": {
+          "android.maxHeapSize": "2048m"
+        },
+        "gradleVersion": "7.5.1",
+        "buildCache": true
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

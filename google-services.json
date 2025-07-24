@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "783199309926",
+    "project_id": "owetest-edfc7",
+    "storage_bucket": "owetest-edfc7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783199309926:android:5d37cfdebe6838678a9da7",
+        "android_client_info": {
+          "package_name": "com.san4bt.OweNus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK5C_fuAfhQWdOYR6ym67YtygN3w7D_70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
