@@ -51,7 +51,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
       const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=sgd');
       const data = await response.json();
       setPrice(data.ethereum.sgd);
-      // console.log('price' + price)
+      console.log('price' + price)
       if (price) setUserBalance(globUser, Math.round(price * parseFloat(balance) * 100) / 100);
       setError(null);
     } catch (err) {
