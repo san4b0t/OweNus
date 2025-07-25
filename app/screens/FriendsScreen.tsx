@@ -102,7 +102,7 @@ const FriendsScreen = ({ navigation }: RouterProps) => {
           imageSource={require('@/assets/assets/images/friends.png')}
           label="Add Friend"
           onPress={handleAddFriend}
-          
+          testID="add-friend-button"
         />
       <Text style={styles.subtitle}>Your Friends</Text>
       <FlatList
