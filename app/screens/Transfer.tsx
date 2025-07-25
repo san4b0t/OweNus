@@ -183,6 +183,7 @@ const Transfer = ({ navigation }: RouterProps) => {
           imageSource={require('@/assets/assets/images/moneybag.png')}
           label="Transfer"
           onPress={handleTransfer}
+          testID={""}
         />
         <Image source={require('@/assets/assets/images/coindropping2.png')} style={styles.coin2}/>
     

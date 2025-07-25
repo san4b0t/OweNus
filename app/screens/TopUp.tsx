@@ -38,12 +38,13 @@ const TopUpScreen = ({ navigation }: RouterProps) => {
         value={amount}
         onChangeText={setAmount}
         keyboardType="numeric"
+        testID={"amount-input"}
       />
       <ActionButton
           imageSource={require('@/assets/assets/images/cash2.png')}
           label="Top Up"
           onPress={handleTopUp}
-          
+          testID={""}
         />
         <Image source={require('@/assets/assets/images/coin2.png')} style={styles.coin}/>
     </View>
