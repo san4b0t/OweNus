@@ -53,7 +53,7 @@ function InsideLayout() {
               ),
           })}
         >
-          <InsideStack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: true }} />
+          <InsideStack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
           <InsideStack.Screen name="Top Up" component={TopUpScreen} />
           <InsideStack.Screen name="Transfer" component={Transfer} />
           <InsideStack.Screen name="Add Expense" component={AddExpenseScreen} />

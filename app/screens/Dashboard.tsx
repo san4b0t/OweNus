@@ -215,6 +215,7 @@ LogBox.ignoreLogs([
         'rgba(15,0,87,1)',
       ]}
       style={styles.gradient}>
+      <View style = {styles.container}>
       <View style={styles.infoCard}>
         <Text style={styles.header}>Welcome, {user?.displayName || 'User'}</Text>
         <Text style={styles.balance}>walletconnect balance (SGD): {price ? (price * parseFloat(balance)).toLocaleString('en-SG', {
@@ -329,6 +330,7 @@ LogBox.ignoreLogs([
         source={require('@/assets/assets/images/cash.png')}
         style={styles.cash}
       />
+      </View>
     </LinearGradient>
   );
 };
@@ -342,6 +344,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     marginBottom: 10,
+    marginTop: 12,
   },
   gradient: {
     display: 'flex',
@@ -436,6 +439,11 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginRight: 8,
+  },
+  container: {
+    flex: 1,
+    padding: 10,
+    marginTop: 30,
   },
 });
 
