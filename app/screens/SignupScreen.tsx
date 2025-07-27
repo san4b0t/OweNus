@@ -14,6 +14,7 @@ const SignupScreen = ({ navigation }: RouterProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [walletId, setWalletId] = useState('');
 
   const handleSignup = async () => {
     if (!name || !email || !password) {
@@ -23,7 +24,7 @@ const SignupScreen = ({ navigation }: RouterProps) => {
     }
 
     try {
-      await Auth.signUp(email, password, name);
+      await Auth.signUp(email, password, name, walletId);
 
     } catch (error: any) {
       Alert.alert('Error', error.message);
@@ -56,6 +57,13 @@ const SignupScreen = ({ navigation }: RouterProps) => {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Wallet ID"
+            value={walletId}
+            onChangeText={setWalletId}
+            autoCapitalize="none"
           />
           <View style={styles.buttonContainer}>
           <AnimatedButton style={styles.signUpButton} onPress={handleSignup}>

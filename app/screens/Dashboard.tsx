@@ -1,7 +1,7 @@
 import { NavigationProp } from '@react-navigation/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, ScrollView, LogBox, Pressable, Animated } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, LogBox, Pressable, Animated, Alert } from 'react-native';
 import { FIREBASE_AUTH } from '@/FirebaseConfig';
 import { collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
 import { db } from '../../FirebaseConfig';
@@ -27,7 +27,6 @@ const Dashboard = ({ navigation } : RouterProps) => {
   const { userData, setUserData } = useContext(UserDataContext);
   const [ trfAmt, setTrfAmt ] = useState(0);
   const user = FIREBASE_AUTH.currentUser;
-  
   
   const projectId = '0848228c792dfdbd3539a2bce980524d';
   const metadata = {
@@ -56,7 +55,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
       setError(null);
     } catch (err) {
       setError('Failed to fetch price');
-      console.error(err);
+      Alert.alert("Connect to wallet to display wallet balance!")
     } finally {
       setLoading(false);
     }
@@ -68,6 +67,8 @@ const Dashboard = ({ navigation } : RouterProps) => {
         balance: amount      
     });
   }
+
+
 
   const getUserDocument = async (uid: string) => {
       const q = query(collection(db, 'users'), where('uid', '==', uid));
@@ -92,6 +93,7 @@ const Dashboard = ({ navigation } : RouterProps) => {
     console.log('working...')
 
     if (isConnected) {
+      setPrice(null);
       return provider?.disconnect();
     }
 
@@ -218,10 +220,11 @@ LogBox.ignoreLogs([
       <View style = {styles.container}>
       <View style={styles.infoCard}>
         <Text style={styles.header}>Welcome, {user?.displayName || 'User'}</Text>
-        <Text style={styles.balance}>walletconnect balance (SGD): {price ? (price * parseFloat(balance)).toLocaleString('en-SG', {
+        <Text style={styles.balance}>Connected Wallet Balance</Text>
+        <Text style={styles.balance}>(SGD): {price && isConnected ? (price * parseFloat(balance)).toLocaleString('en-SG', {
         style: 'currency',
         currency: 'SGD'
-      }) : 'error'}</Text>
+      }) : 'no wallet connected'}</Text>
         <Text style={styles.subtitle1}>Recent Expenses:</Text>
         <FlatList
           data={expenses}
@@ -286,7 +289,7 @@ LogBox.ignoreLogs([
             testID="transferButton"
             imageSource={require('@/assets/assets/images/transfer.png')}
             label="Transfer"
-            onPress={() => navigation.navigate('Transfer')}
+            onPress={() => {isConnected ? navigation.navigate('Transfer') : Alert.alert("Connect to wallet to access transfer service!")}}
           />
 
           <ActionButton
