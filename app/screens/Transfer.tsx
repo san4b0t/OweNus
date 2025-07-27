@@ -150,14 +150,16 @@ const Transfer = ({ navigation }: RouterProps) => {
       console.log('walletid:' + friendData.walletId)
       onSendTransaction(friendData.walletId).then(reloadApp);
 
+      
+    } catch (error: any) {
+      Alert.alert('Transfer Failed', error.message);
+      console.error('Transfer error:', error);
+    } finally {
       Alert.alert(
         'Received', 
         `Commencing transfer $${amountNumber.toFixed(2)} to ${friendName}`,
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
-    } catch (error: any) {
-      Alert.alert('Transfer Failed', error.message);
-      console.error('Transfer error:', error);
     }
   };
 

@@ -42,19 +42,6 @@ describe('SignupScreen', () => {
     expect(getByText('already have an account? log in')).toBeTruthy();
   });
 
-//   it('shows error when fields are empty', async () => {
-//     const { getByText } = render(
-//       <SignupScreen navigation={mockNavigation as any} />
-//     );
-
-//     fireEvent.press(getByText('sign up'));
-
-//     await waitFor(() => {
-//       expect(mockAlert).toHaveBeenCalledWith('Error', 'Please fill all fields');
-//       expect(Auth.signUp).not.toHaveBeenCalled();
-//     });
-//   });
-
   it('calls Auth.signUp with correct parameters when form is valid', async () => {
     (Auth.signUp as jest.Mock).mockResolvedValueOnce({});
     
@@ -65,13 +52,15 @@ describe('SignupScreen', () => {
     fireEvent.changeText(getByPlaceholderText('Name'), 'Test User');
     fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
     fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
+    fireEvent.changeText(getByPlaceholderText('Wallet ID'), '0xeA7512eB6E2b62B3724367948FBcf9f2e6F32A5D');
     fireEvent.press(getByText('sign up'));
 
     await waitFor(() => {
       expect(Auth.signUp).toHaveBeenCalledWith(
         'test@example.com',
         'password123',
-        'Test User'
+        'Test User',
+        '0xeA7512eB6E2b62B3724367948FBcf9f2e6F32A5D',
       );
     });
   });
@@ -85,22 +74,4 @@ describe('SignupScreen', () => {
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith('Login');
   });
-
-//   it('shows error when signup fails', async () => {
-//     const errorMessage = 'Signup failed';
-//     (Auth.signUp as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
-
-//     const { getByPlaceholderText, getByText } = render(
-//       <SignupScreen navigation={mockNavigation as any} />
-//     );
-
-//     fireEvent.changeText(getByPlaceholderText('Name'), 'Test User');
-//     fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
-//     fireEvent.changeText(getByPlaceholderText('Password'), 'password123');
-//     fireEvent.press(getByText('sign up'));
-
-//     await waitFor(() => {
-//       expect(mockAlert).toHaveBeenCalledWith('Error', errorMessage);
-//     });
-//   });
 });

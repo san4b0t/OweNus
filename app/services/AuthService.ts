@@ -3,7 +3,7 @@ import { setDoc, doc } from 'firebase/firestore';
 import { FIREBASE_AUTH, db } from '../../FirebaseConfig';
 
 export const Auth = {
-  async signUp(email: string, password: string, name: string) {
+  async signUp(email: string, password: string, name: string, walletId: string) {
     if (email == "" || password == "" || name == "") throw console.error("Please fill all fields");
     
     try {
@@ -23,6 +23,7 @@ export const Auth = {
         email,
         balance: 0,
         createdAt: new Date(),
+        walletId: walletId,
       });
 
       await setDoc(doc(db, 'weights', userCredential.user.uid), {
