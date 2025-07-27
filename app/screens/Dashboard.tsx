@@ -14,6 +14,8 @@ import * as Updates from 'expo-updates';
 import {numberToHex, sanitizeHex, utf8ToHex} from '@walletconnect/encoding';
 import { ethers, JsonRpcProvider, formatEther } from 'ethers';
 import { TransferService } from '../services/TransferService';
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -43,6 +45,11 @@ const Dashboard = ({ navigation } : RouterProps) => {
   const [price, setPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [dueSoonExpenses, setDueSoonExpenses] = useState<any[]>([]);
+  const [dismissedIds, setDismissedIds] = useState<string[]>([]);
+  const [alertDismissed, setAlertDismissed] = useState(false); 
 
   const fetchPrice = async () => {
     try {
@@ -208,6 +215,29 @@ LogBox.ignoreLogs([
     };
   }, []);
 
+    useFocusEffect(
+    React.useCallback(() => {
+      const checkDeadlines = async () => {
+        if (!expenses || expenses.length === 0) return;
+        const now = new Date();
+        const upcomingExpenses = expenses.filter(expense => {
+          const deadline = expense?.deadline?.toDate?.() || new Date(expense.deadline);
+          const timeDiff = deadline.getTime() - now.getTime();
+          const hoursDiff = timeDiff / (1000 * 60 * 60);
+          return !expense.paid && hoursDiff <= 24 && hoursDiff > 0;
+        });
+
+        setDueSoonExpenses(upcomingExpenses);
+      };
+
+      setAlertDismissed(false); 
+      checkDeadlines();
+    }, [expenses])
+  );
+  const dismissAlert = () => {
+    setAlertVisible(false);
+  };
+
   return (
     <LinearGradient
       colors={[
@@ -218,6 +248,29 @@ LogBox.ignoreLogs([
       ]}
       style={styles.gradient}>
       <View style = {styles.container}>
+       {dueSoonExpenses.length > 0 && !alertDismissed && (
+      <View style={styles.alertBanner}>
+        <Text style={styles.alertText}>
+          ⚠️ You have {dueSoonExpenses.length} unpaid expense{dueSoonExpenses.length > 1 ? 's' : ''} due within 24 hours.
+        </Text>
+        <Pressable onPress={() => setAlertDismissed(true)}>
+          <Text style={styles.dismissText}>Dismiss</Text>
+        </Pressable>
+      </View>
+    )}
+
+    {dueSoonExpenses
+      .filter((exp) => !dismissedIds.includes(exp.id))
+      .map((expense) => (
+        <View key={expense.id} style={styles.alertBanner}>
+          <Text style={styles.alertText}>
+            ⏰ Payment for "{expense.description}" is due within 24 hours .
+          </Text>
+          <Pressable onPress={() => setDismissedIds((prev) => [...prev, expense.id])}>
+            <Text style={styles.dismissText}>Dismiss</Text>
+          </Pressable>
+        </View>
+    ))}
       <View style={styles.infoCard}>
         <Text style={styles.header}>Welcome, {user?.displayName || 'User'}</Text>
         <Text style={styles.balance}>Connected Wallet Balance</Text>
@@ -448,6 +501,28 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 30,
   },
+  alertBanner: {
+  backgroundColor: '#ffe4b3',
+  padding: 12,
+  borderRadius: 10,
+  marginHorizontal: 12,
+  marginBottom: 10,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+alertText: {
+  color: '#754000ff',
+  fontFamily: 'Jersey25',
+  fontSize: 16,
+  flex: 1,
+  paddingRight: 10,
+},
+dismissText: {
+  color: '#cc5500',
+  fontWeight: 'bold',
+  fontFamily: 'Orbitron',
+},
 });
 
 export default Dashboard;
