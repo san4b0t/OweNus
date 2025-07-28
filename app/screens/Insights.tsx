@@ -5,6 +5,7 @@ import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/core';
+import { handler } from '@/assets/model/model';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
@@ -26,9 +27,11 @@ export default function InsightsScreen() {
         await tf.ready();
         const loadedModel = await tf.loadLayersModel(bundleResourceIO(modelJson, modelWeights));
         setModel(loadedModel);
+        
       } catch (error) {
         console.error('🚨 Failed to load local model:', error);
-        Alert.alert('Model Error', 'Failed to load model. Check the assets or file paths.');
+        // Alert.alert('Model Error', 'Failed to load model. Check the assets or file paths.');
+        
       } finally {
         setLoading(false);
       }
@@ -37,8 +40,7 @@ export default function InsightsScreen() {
     loadModel();
   }, []);
 
-  const handlePredict = () => {
-    if (!model) return;
+  const handlePredict = async () => {
 
     const numParticipants = parseFloat(participants);
     const month = parseFloat(deadlineMonth);
@@ -47,15 +49,16 @@ export default function InsightsScreen() {
       Alert.alert('Invalid Input', 'Enter valid numbers for both fields.');
       return;
     }
-
+    
     const input = tf.tensor2d([[numParticipants, month]]);
-    const predictionTensor = model.predict(input) as tf.Tensor;
+    const predictionTensor = model?.predict(input) as tf.Tensor;
+    const num = await handler(month, numParticipants);
     const predictedValue = predictionTensor.dataSync()[0];
-
-    setPrediction(predictedValue);
-
     input.dispose();
     predictionTensor.dispose();
+    setPrediction(num);
+    return
+
   };
 
   if (loading) {
@@ -106,8 +109,8 @@ export default function InsightsScreen() {
 
         {prediction !== null && (
           <View style={styles.resultCard}>
-            <Ionicons name="trending-up" size={24} color="#ffa600ff" />
-            <Text style={styles.result}>${prediction.toFixed(2)}</Text>
+            <Ionicons name="trending-down" size={24} color="#ffa600ff" />
+            <Text style={styles.result}>${prediction}</Text>
           </View>
         )}
       </View>
