@@ -62,6 +62,6 @@ export const handler = async (months: number, participants: number) => {
       console.warn("No content returned.");
     }
   } catch (err) {
-    console.error("OpenAI API call failed:", err);
+    console.error("Call failed:", err);
   }
   };
